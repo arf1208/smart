@@ -37,30 +37,61 @@ const QuestionGenerator: React.FC = () => {
   };
 
   const handleExportWord = () => {
-    const content = document.getElementById('printable-soal-content')?.innerHTML || '';
+    const contentElement = document.getElementById('printable-soal-content');
+    if (!contentElement || !result) return;
+
     const header = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
       <head><meta charset='utf-8'><title>Bank Soal</title>
       <style>
-        body { font-family: "Times New Roman", serif; }
-        .soal-item { margin-bottom: 20px; }
-        .soal-text { font-weight: bold; }
-        .opsi-list { margin-left: 20px; }
-        .kunci-jawaban { background-color: #f0fdf4; padding: 10px; border: 1px solid #dcfce7; }
+        @page { size: A4; margin: 2cm; }
+        body { font-family: "Times New Roman", serif; font-size: 11pt; line-height: 1.4; }
+        h1 { text-align: center; font-size: 16pt; margin-bottom: 20pt; text-transform: uppercase; }
+        .soal-item { margin-bottom: 15pt; page-break-inside: avoid; }
+        .soal-text { font-weight: bold; margin-bottom: 8pt; }
+        .opsi-container { margin-left: 20pt; margin-bottom: 10pt; }
+        .opsi-item { margin-bottom: 3pt; }
+        .kunci-box { margin-top: 10pt; padding: 10pt; background: #f9f9f9; border: 1pt solid #ddd; font-style: italic; font-size: 10pt; }
+        .header-meta { border-bottom: 2pt solid #000; margin-bottom: 20pt; padding-bottom: 10pt; }
       </style>
       </head><body>
-      <h1>${result?.header || 'Bank Soal'}</h1>
+      <div class="header-meta">
+        <h1 style="margin:0;">BANK SOAL ASESMEN</h1>
+        <p style="margin:0; text-align:center;">Mata Pelajaran: <b>${formData.subject}</b> | Jenjang: <b>${formData.level}</b></p>
+        <p style="margin:0; text-align:center;">Penyusun: <b>${formData.teacherName}</b></p>
+      </div>
+      <div id="content">
     `;
-    const footer = "</body></html>";
-    const sourceHTML = header + content + footer;
     
-    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+    // Clean content by removing UI-only elements for a clean Word Doc
+    const cleanContent = Array.from(contentElement.querySelectorAll('.soal-item')).map((item, idx) => {
+      const qText = item.querySelector('.soal-text')?.textContent;
+      const options = Array.from(item.querySelectorAll('.opsi-item-text')).map((opt, i) => 
+        `<div class="opsi-item">${String.fromCharCode(65 + i)}. ${opt.textContent}</div>`
+      ).join('');
+      const answer = item.querySelector('.kunci-jawaban-text')?.textContent;
+      
+      return `
+        <div class="soal-item">
+          <div class="soal-text">${idx + 1}. ${qText}</div>
+          <div class="opsi-container">${options}</div>
+          <div class="kunci-box"><b>Kunci & Pembahasan:</b> ${answer}</div>
+        </div>
+      `;
+    }).join('');
+
+    const footer = "</div></body></html>";
+    const sourceHTML = header + cleanContent + footer;
+    
+    const blob = new Blob(['\ufeff', sourceHTML], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
     const fileDownload = document.createElement("a");
     document.body.appendChild(fileDownload);
-    fileDownload.href = source;
-    fileDownload.download = `Bank_Soal_${formData.subject}_${formData.teacherName.replace(/\s/g, '_')}.doc`;
+    fileDownload.href = url;
+    fileDownload.download = `Bank_Soal_${formData.subject.replace(/\s/g, '_')}_${formData.teacherName.replace(/\s/g, '_')}.doc`;
     fileDownload.click();
     document.body.removeChild(fileDownload);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -290,7 +321,7 @@ const QuestionGenerator: React.FC = () => {
                                 <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-400 group-hover/opt:text-blue-500 group-hover/opt:border-blue-200 shadow-sm transition-all shrink-0">
                                   {String.fromCharCode(65 + idx)}
                                 </div>
-                                <span className="text-slate-700 font-medium">{opt}</span>
+                                <span className="text-slate-700 font-medium opsi-item-text">{opt}</span>
                               </div>
                             ))}
                           </div>
@@ -302,7 +333,7 @@ const QuestionGenerator: React.FC = () => {
                             Kunci Jawaban & Pembahasan
                           </div>
                           <p className="text-slate-800 font-bold"><span className="text-emerald-600">Jawaban Benar:</span> {s.jawabanBenar}</p>
-                          <p className="text-slate-600 text-sm leading-relaxed"><span className="font-bold text-slate-800">Penjelasan:</span> {s.penjelasan}</p>
+                          <p className="text-slate-600 text-sm leading-relaxed kunci-jawaban-text"><span className="font-bold text-slate-800">Jawaban ${s.jawabanBenar}. Penjelasan:</span> {s.penjelasan}</p>
                         </div>
                       </div>
                     </div>

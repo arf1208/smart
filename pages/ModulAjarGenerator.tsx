@@ -36,25 +36,64 @@ const ModulAjarGenerator: React.FC = () => {
   };
 
   const handleExportWord = () => {
-    const content = document.getElementById('printable-modul-content')?.innerText || '';
-    // Basic Word export logic using simple formatting for Markdown text
+    if (!result) return;
+
+    // Simple Markdown to HTML converter for professional Word Export
+    const convertMarkdownToHtml = (md: string) => {
+      return md
+        .replace(/^### (.*$)/gim, '<h3 style="margin-top:14pt; margin-bottom:4pt; font-family:Arial, sans-serif;">$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2 style="margin-top:18pt; margin-bottom:6pt; font-family:Arial, sans-serif; border-bottom: 1px solid #eee;">$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1 style="text-align:center; margin-bottom:20pt; font-family:Arial, sans-serif;">$1</h1>')
+        .replace(/^\d+\.\s+(.*$)/gim, '<p style="margin-left:20pt; text-indent:-20pt; margin-bottom:6pt;">$1</p>')
+        .replace(/^[\*-]\s+(.*$)/gim, '<li style="margin-left:20pt; margin-bottom:4pt;">$1</li>')
+        .replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>')
+        .replace(/\*(.*?)\*/gim, '<i>$1</i>')
+        .split('\n').map(line => line.trim() === '' ? '<br>' : (line.startsWith('<') ? line : `<p style="margin-bottom:8pt; text-align:justify;">${line}</p>`)).join('');
+    };
+
+    const htmlContent = convertMarkdownToHtml(result);
+
     const header = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head><meta charset='utf-8'><title>Modul Ajar</title>
-      <style>body { font-family: "Times New Roman", serif; line-height: 1.5; }</style>
-      </head><body>
-      <div style="white-space: pre-wrap;">
+      <head>
+        <meta charset='utf-8'>
+        <title>Modul Ajar</title>
+        <style>
+          @page {
+            size: A4;
+            margin: 2.54cm;
+          }
+          body {
+            font-family: "Times New Roman", serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            color: #000;
+          }
+          h1, h2, h3 { color: #2c3e50; }
+        </style>
+      </head>
+      <body>
+        <div style="margin-bottom: 30pt; text-align: center; border-bottom: 2px solid #000; padding-bottom: 10pt;">
+          <h2 style="margin: 0; font-size: 16pt;">MODUL AJAR KURIKULUM MERDEKA</h2>
+          <p style="margin: 5pt 0 0 0; font-size: 12pt; font-weight: bold;">${formData.subject.toUpperCase()} - ${formData.topic.toUpperCase()}</p>
+        </div>
+        ${htmlContent}
+      </body>
+      </html>
     `;
-    const footer = "</div></body></html>";
-    const sourceHTML = header + content + footer;
     
-    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+    const blob = new Blob(['\ufeff', header], {
+      type: 'application/msword'
+    });
+    
+    const url = URL.createObjectURL(blob);
     const fileDownload = document.createElement("a");
     document.body.appendChild(fileDownload);
-    fileDownload.href = source;
-    fileDownload.download = `Modul_Ajar_${formData.subject}_${formData.teacherName.replace(/\s/g, '_')}.doc`;
+    fileDownload.href = url;
+    fileDownload.download = `Modul_Ajar_${formData.subject.replace(/\s/g, '_')}_${formData.teacherName.replace(/\s/g, '_')}.doc`;
     fileDownload.click();
     document.body.removeChild(fileDownload);
+    URL.revokeObjectURL(url);
   };
 
   return (
