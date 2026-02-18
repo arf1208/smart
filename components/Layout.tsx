@@ -11,7 +11,6 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, onLogout }) => {
   return (
     <div className="flex flex-col h-screen bg-slate-50 overflow-hidden font-['Inter']">
-      {/* simplified Top Header */}
       <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 md:px-12 z-20 no-print shrink-0">
         <div 
           className="flex items-center gap-3 cursor-pointer group"
@@ -22,12 +21,11 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, onLo
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-800 tracking-tight leading-none group-hover:text-blue-600 transition-colors">Smart School</h1>
-            <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest mt-1">Pusat Layanan Guru Inovatif</p>
+            <p className="text-[10px] text-blue-600 font-bold uppercase tracking-[0.2em] mt-1">Asisten Digital Guru</p>
           </div>
         </div>
         
         <div className="flex items-center gap-6">
-          {/* Minimalist Action Area - Profile fully removed as requested */}
           <div className="flex items-center">
              <button 
                onClick={onLogout}
@@ -42,7 +40,6 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, onLo
         </div>
       </header>
 
-      {/* Main Content Area */}
       <main className="flex-1 flex flex-col overflow-hidden relative">
         <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#fcfdfe]">
           <div className="max-w-7xl mx-auto w-full">

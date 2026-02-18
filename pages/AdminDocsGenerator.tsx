@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { generateAdminDocs } from '../services/geminiService';
 import { EducationLevel, Fase } from '../types';
-import { Icons } from '../constants';
 
 const AdminDocsGenerator: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -15,6 +14,23 @@ const AdminDocsGenerator: React.FC = () => {
     docType: 'ATP' as 'ATP' | 'CP' | 'RPP'
   });
 
+  const renderDocument = (text: string) => {
+    let html = text
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/\|(.+)\|/g, (match) => {
+        if (match.includes('---')) return '';
+        const cells = match.split('|').filter(c => c.trim() !== '');
+        return `<tr>${cells.map(c => `<td class="border border-slate-300 p-4 text-sm font-medium">${c.trim()}</td>`).join('')}</tr>`;
+      })
+      .replace(/(<tr>.*<\/tr>)+/g, match => `<table class="w-full border-collapse my-8 bg-white shadow-sm border-2 border-slate-200"><tbody>${match}</tbody></table>`)
+      .replace(/^## (.*$)/gim, '<h2 class="admin-h2">$1</h2>')
+      .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-black text-slate-900">$1</strong>')
+      .replace(/\n\n/g, '<div class="h-6"></div>')
+      .replace(/\n/g, '<br />');
+    
+    return { __html: html };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -23,159 +39,75 @@ const AdminDocsGenerator: React.FC = () => {
       const data = await generateAdminDocs(formData);
       setResult(data || 'Gagal generate konten.');
     } catch (err) {
-      console.error(err);
       alert('Terjadi kesalahan.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleExportWord = () => {
-    if (!result) return;
-
-    // Standard Markdown to HTML for Academic Admin Docs
-    const convertMarkdownToHtml = (md: string) => {
-      return md
-        .replace(/^### (.*$)/gim, '<h3 style="margin-top:12pt; margin-bottom:4pt; color:#34495e;">$1</h3>')
-        .replace(/^## (.*$)/gim, '<h2 style="margin-top:16pt; margin-bottom:6pt; border-bottom:1pt solid #ccc; padding-bottom:3pt; color:#2c3e50;">$1</h2>')
-        .replace(/^# (.*$)/gim, '<h1 style="text-align:center; margin-bottom:20pt; font-size:18pt; color:#2c3e50;">$1</h1>')
-        .replace(/^[\*-]\s+(.*$)/gim, '<li style="margin-bottom:3pt;">$1</li>')
-        .replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>')
-        .replace(/\n/gim, '<br>');
-    };
-
-    const htmlContent = convertMarkdownToHtml(result);
-
-    const header = `
-      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head><meta charset='utf-8'><title>${formData.docType}</title>
-      <style>
-        @page { size: A4; margin: 2.5cm; }
-        body { font-family: "Times New Roman", serif; font-size: 11pt; line-height: 1.4; }
-      </style>
-      </head><body>
-      <div style="text-align:center; border-bottom:2pt solid #000; margin-bottom:20pt; padding-bottom:10pt;">
-        <h2 style="margin:0;">DOKUMEN ADMINISTRASI GURU</h2>
-        <p style="margin:0; font-weight:bold;">TIPE DOKUMEN: ${formData.docType} | MATA PELAJARAN: ${formData.subject.toUpperCase()}</p>
-      </div>
-      ${htmlContent}
-      </body></html>
-    `;
-    
-    const blob = new Blob(['\ufeff', header], { type: 'application/msword' });
-    const url = URL.createObjectURL(blob);
-    const fileDownload = document.createElement("a");
-    document.body.appendChild(fileDownload);
-    fileDownload.href = url;
-    fileDownload.download = `Admin_${formData.docType}_${formData.subject.replace(/\s/g, '_')}.doc`;
-    fileDownload.click();
-    document.body.removeChild(fileDownload);
-    URL.revokeObjectURL(url);
-  };
-
-  const docDesc = {
-    'ATP': 'Alur logis pengajaran satu fase penuh untuk memastikan tujuan pembelajaran tercapai.',
-    'CP': 'Analisis mendalam elemen capaian kompetensi per fase sesuai Standar Nasional Pendidikan.',
-    'RPP': 'Rencana harian (Lesson Plan) yang padat, operasional, dan berorientasi pada aksi kelas.'
-  };
-
   return (
     <div className="pb-20">
-      <div className="pt-16 pb-12 px-8 text-center bg-white border-b border-slate-100 relative overflow-hidden no-print">
-        <div className="relative z-10 max-w-4xl mx-auto space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-50 text-amber-600 rounded-full border border-amber-100 text-xs font-bold uppercase tracking-wider">
-            Admin Governance Tool
-          </div>
-          <h1 className="text-4xl md:text-6xl font-black text-[#1e293b] leading-[1.1] tracking-tight">
-            Administrasi<br/>
-            <span className="text-amber-600">Terstruktur & Akuntabel.</span>
-          </h1>
-          <p className="text-lg text-slate-500 max-w-2xl mx-auto font-medium">
-            Dokumen CP, ATP, dan RPP yang selaras, memudahkan verifikasi pengawas dan memperjelas peta jalan mengajar Anda.
-          </p>
-        </div>
+      <div className="pt-16 pb-12 px-8 text-center bg-white border-b border-slate-100 no-print">
+        <h1 className="text-4xl font-black text-slate-800 tracking-tight">Administrasi <span className="text-amber-600">Kurikulum Merdeka</span></h1>
+        <p className="text-lg text-slate-500 mt-4 font-medium">Pemetaan CP, Alur Tujuan Pembelajaran (ATP), dan RPP secara otomatis.</p>
       </div>
 
-      <div className="max-w-4xl mx-auto mt-[-40px] px-8">
-        <div className="bg-white rounded-[32px] shadow-2xl shadow-amber-100/50 border border-slate-100 p-8 md:p-12 no-print">
+      <div className="max-w-5xl mx-auto mt-[-40px] px-8">
+        <div className="bg-white rounded-[40px] shadow-2xl p-8 md:p-12 no-print">
           <form onSubmit={handleSubmit} className="space-y-10">
-            <div className="space-y-6">
-               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 ml-1">Pilih Jenis Dokumen</label>
-                <div className="grid grid-cols-3 gap-4">
-                  {(['ATP', 'CP', 'RPP'] as const).map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setFormData({...formData, docType: type})}
-                      className={`py-4 rounded-2xl font-black transition-all border ${
-                        formData.docType === type 
-                          ? 'bg-amber-600 text-white border-amber-600 shadow-lg' 
-                          : 'bg-white text-slate-500 border-slate-200 hover:border-amber-300'
-                      }`}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-[11px] text-slate-400 font-medium italic mt-2 px-2">
-                   {docDesc[formData.docType]}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 ml-1">Nama Guru Pembuat</label>
-                <input 
-                  type="text"
-                  className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-amber-500/20 outline-none font-medium"
-                  value={formData.teacherName}
-                  onChange={e => setFormData({...formData, teacherName: e.target.value})}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 ml-1">Mata Pelajaran</label>
-                <input 
-                  type="text"
-                  className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-amber-500/20 outline-none font-medium"
-                  placeholder="Contoh: Sosiologi"
-                  value={formData.subject}
-                  onChange={e => setFormData({...formData, subject: e.target.value})}
-                  required
-                />
-              </div>
+            <div className="grid grid-cols-3 gap-6">
+              {['ATP', 'CP', 'RPP'].map(t => (
+                <button 
+                  key={t} 
+                  type="button" 
+                  onClick={() => setFormData({...formData, docType: t as any})} 
+                  className={`py-5 rounded-2xl font-black text-lg border-2 transition-all ${
+                    formData.docType === t 
+                    ? 'bg-amber-600 text-white border-amber-600 shadow-xl shadow-amber-100' 
+                    : 'bg-slate-50 text-slate-400 border-slate-100 hover:border-amber-200'
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
             </div>
-
-            <button 
-              type="submit"
-              disabled={loading}
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white font-black py-6 rounded-3xl shadow-xl shadow-amber-100 transition-all active:scale-[0.98] disabled:opacity-50"
-            >
-              {loading ? 'Menganalisis Kurikulum...' : `Hasilkan Dokumen ${formData.docType}`}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+               <div className="space-y-3">
+                 <label className="label">Mata Pelajaran</label>
+                 <input className="input-field" placeholder="Sejarah Indonesia" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} required />
+               </div>
+               <div className="space-y-3">
+                 <label className="label">Fase / Kelas</label>
+                 <select className="input-field" value={formData.fase} onChange={e => setFormData({...formData, fase: e.target.value as Fase})}>
+                   {Object.values(Fase).map(v => <option key={v} value={v}>{v}</option>)}
+                 </select>
+               </div>
+            </div>
+            <button className="w-full bg-slate-900 text-white font-black py-6 rounded-3xl shadow-xl transition-all hover:bg-black text-lg">
+              Generate Dokumen Sekarang
             </button>
           </form>
         </div>
 
         {result && (
-          <div className="mt-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <div className="bg-white p-10 md:p-16 rounded-[32px] border border-slate-100 shadow-xl space-y-8 print-container">
-              <div className="flex items-center justify-between pb-8 border-b border-slate-100 no-print">
-                <h3 className="text-2xl font-black text-slate-800">Review Dokumen {formData.docType}</h3>
-                <button 
-                  onClick={handleExportWord}
-                  className="px-6 py-3 bg-amber-600 text-white font-bold rounded-2xl hover:bg-amber-700 transition-colors shadow-lg shadow-amber-100"
-                >
-                  Ekspor Word
-                </button>
-              </div>
-              <div className="prose prose-amber max-w-none bg-slate-50 p-12 rounded-[24px] border border-slate-200 whitespace-pre-wrap font-serif leading-relaxed print:bg-white print:border-none">
-                {result}
-              </div>
+          <div className="mt-16 animate-in fade-in duration-700">
+            <div className="bg-white p-16 md:p-24 rounded-[48px] shadow-2xl border border-slate-100 print:shadow-none print:border-none print:p-0">
+               <div className="mb-12 border-b-2 border-slate-100 pb-8">
+                  <h2 className="text-3xl font-black text-slate-900 uppercase">Dokumen {formData.docType}</h2>
+                  <p className="text-slate-500 font-bold mt-2 uppercase tracking-widest">{formData.subject} - {formData.fase}</p>
+               </div>
+               <div className="admin-renderer" dangerouslySetInnerHTML={renderDocument(result)} />
             </div>
           </div>
         )}
       </div>
+
+      <style>{`
+        .label { @apply text-xs font-black text-slate-400 uppercase tracking-widest ml-1; }
+        .input-field { @apply w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all font-bold text-slate-700; }
+        .admin-renderer { @apply leading-[1.9] text-lg text-slate-800; }
+        .admin-h2 { @apply text-2xl font-black text-slate-900 mt-12 mb-6 border-l-8 border-amber-600 pl-6 bg-slate-50 py-4 rounded-r-3xl; }
+      `}</style>
     </div>
   );
 };
