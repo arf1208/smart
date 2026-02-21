@@ -1,5 +1,5 @@
 {
   "name": "Smart School",
-  "description": "Platform asisten guru berbasis AI untuk pembuatan modul ajar, soal asesmen, LKPD, dan administrasi kurikulum merdeka secara instan.",
+  "description": "Platform asisten guru untuk pembuatan modul ajar, soal asesmen, LKPD, dan administrasi kurikulum merdeka secara instan.",
   "requestFramePermissions": []
 }

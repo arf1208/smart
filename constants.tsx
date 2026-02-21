@@ -1,5 +1,65 @@
 
 import React from 'react';
+import { Subject, SubjectCategory } from './types';
+
+export const SUBJECTS: Subject[] = [
+  // UMUM
+  { id: 'bind', name: 'Bahasa Indonesia', category: SubjectCategory.UMUM },
+  { id: 'mtk', name: 'Matematika', category: SubjectCategory.UMUM },
+  { id: 'bing', name: 'Bahasa Inggris', category: SubjectCategory.UMUM },
+  { id: 'pai', name: 'Pendidikan Agama Islam', category: SubjectCategory.UMUM },
+  { id: 'ppkn', name: 'PPKn', category: SubjectCategory.UMUM },
+  { id: 'ipa', name: 'IPA (Ilmu Pengetahuan Alam)', category: SubjectCategory.UMUM },
+  { id: 'ips', name: 'IPS (Ilmu Pengetahuan Sosial)', category: SubjectCategory.UMUM },
+  { id: 'pjok', name: 'PJOK', category: SubjectCategory.UMUM },
+  { id: 'seni', name: 'Seni Budaya', category: SubjectCategory.UMUM },
+  { id: 'info', name: 'Informatika', category: SubjectCategory.UMUM },
+  { id: 'sej', name: 'Sejarah', category: SubjectCategory.UMUM },
+  { id: 'fis', name: 'Fisika', category: SubjectCategory.UMUM },
+  { id: 'kim', name: 'Kimia', category: SubjectCategory.UMUM },
+  { id: 'bio', name: 'Biologi', category: SubjectCategory.UMUM },
+  { id: 'geo', name: 'Geografi', category: SubjectCategory.UMUM },
+  { id: 'eko', name: 'Ekonomi', category: SubjectCategory.UMUM },
+  { id: 'sos', name: 'Sosiologi', category: SubjectCategory.UMUM },
+
+  // KEJURUAN - TI
+  { id: 'rpl', name: 'Rekayasa Perangkat Lunak (RPL)', category: SubjectCategory.KEJURUAN, subCategory: 'Teknologi Informasi' },
+  { id: 'tkj', name: 'Teknik Komputer dan Jaringan (TKJ)', category: SubjectCategory.KEJURUAN, subCategory: 'Teknologi Informasi' },
+  { id: 'dkv', name: 'Desain Komunikasi Visual (DKV)', category: SubjectCategory.KEJURUAN, subCategory: 'Teknologi Informasi' },
+  { id: 'si', name: 'Sistem Informasi', category: SubjectCategory.KEJURUAN, subCategory: 'Teknologi Informasi' },
+
+  // KEJURUAN - BISNIS
+  { id: 'akt', name: 'Akuntansi', category: SubjectCategory.KEJURUAN, subCategory: 'Bisnis & Manajemen' },
+  { id: 'pms', name: 'Pemasaran', category: SubjectCategory.KEJURUAN, subCategory: 'Bisnis & Manajemen' },
+  { id: 'mplb', name: 'Manajemen Perkantoran (MPLB)', category: SubjectCategory.KEJURUAN, subCategory: 'Bisnis & Manajemen' },
+
+  // KEJURUAN - TEKNIK
+  { id: 'tm', name: 'Teknik Mesin', category: SubjectCategory.KEJURUAN, subCategory: 'Teknik' },
+  { id: 'to', name: 'Teknik Otomotif', category: SubjectCategory.KEJURUAN, subCategory: 'Teknik' },
+  { id: 'tl', name: 'Teknik Listrik', category: SubjectCategory.KEJURUAN, subCategory: 'Teknik' },
+  { id: 'tp', name: 'Teknik Pengelasan', category: SubjectCategory.KEJURUAN, subCategory: 'Teknik' },
+  { id: 'tkb', name: 'Teknik Konstruksi Bangunan', category: SubjectCategory.KEJURUAN, subCategory: 'Teknik' },
+
+  // KEJURUAN - PARIWISATA
+  { id: 'ph', name: 'Perhotelan', category: SubjectCategory.KEJURUAN, subCategory: 'Pariwisata' },
+  { id: 'tb', name: 'Tata Boga', category: SubjectCategory.KEJURUAN, subCategory: 'Pariwisata' },
+  { id: 'ts', name: 'Tata Busana', category: SubjectCategory.KEJURUAN, subCategory: 'Pariwisata' },
+  { id: 'kc', name: 'Kecantikan', category: SubjectCategory.KEJURUAN, subCategory: 'Pariwisata' },
+
+  // KEJURUAN - KESEHATAN
+  { id: 'kep', name: 'Keperawatan', category: SubjectCategory.KEJURUAN, subCategory: 'Kesehatan' },
+  { id: 'far', name: 'Farmasi', category: SubjectCategory.KEJURUAN, subCategory: 'Kesehatan' },
+
+  // KEJURUAN - AGRIBISNIS
+  { id: 'atp', name: 'Agribisnis Tanaman Pangan', category: SubjectCategory.KEJURUAN, subCategory: 'Pertanian' },
+  { id: 'ap', name: 'Agribisnis Peternakan', category: SubjectCategory.KEJURUAN, subCategory: 'Peternakan' },
+
+  // MUATAN LOKAL
+  { id: 'mulo-jawa', name: 'Bahasa Jawa', category: SubjectCategory.MUATAN_LOKAL },
+  { id: 'mulo-sunda', name: 'Bahasa Sunda', category: SubjectCategory.MUATAN_LOKAL },
+];
+
+export const APP_LOGO_URL = "https://image2url.com/r2/default/images/1771660712554-f01150ae-9d91-402b-883f-9f4b4150aa7b.jpeg";
 
 export const Icons = {
   Dashboard: (props: React.SVGProps<SVGSVGElement>) => (

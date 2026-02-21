@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import { generateQuestions } from '../services/geminiService';
 import { EducationLevel, Fase } from '../types';
+import { SUBJECTS } from '../constants';
 
 const QuestionGenerator: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState('');
   const [result, setResult] = useState<any | null>(null);
   const [formData, setFormData] = useState({
     teacherName: 'Budi Santoso, S.Pd',
@@ -12,22 +14,44 @@ const QuestionGenerator: React.FC = () => {
     fase: Fase.E,
     kelas: '10-A',
     subject: '',
-    count: 10,
+    count: 5,
     type: 'Pilihan Ganda' as 'Pilihan Ganda' | 'Essay',
     difficulty: 'Sedang' as 'Mudah' | 'Sedang' | 'Sulit'
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     setLoading(true);
+    setLoadingStatus('Menganalisis Kurikulum Merdeka...');
     setResult(null);
+    
+    const statuses = [
+      'Sedang menyusun materi...',
+      'Memvalidasi kurikulum...',
+      'Merapikan format dokumen...',
+      'Hampir selesai...'
+    ];
+
+    let statusIndex = 0;
+    const interval = setInterval(() => {
+      setLoadingStatus(statuses[statusIndex % statuses.length]);
+      statusIndex++;
+    }, 4000); // Slower updates for better feel
+
     try {
       const data = await generateQuestions(formData);
+      if (!data || !data.soal || data.soal.length === 0) {
+        throw new Error("Hasil generate kosong. Silakan coba lagi.");
+      }
       setResult(data);
-    } catch (err) {
-      alert('Gagal generate soal.');
+    } catch (err: any) {
+      console.error(err);
+      alert('Gagal generate soal: ' + (err.message || 'Terjadi kesalahan sistem.'));
     } finally {
+      clearInterval(interval);
       setLoading(false);
+      setLoadingStatus('');
     }
   };
 
@@ -56,7 +80,7 @@ const QuestionGenerator: React.FC = () => {
     if (!result) return;
     let csv = "Nomor,Pertanyaan,Kunci,Penjelasan\n";
     result.soal?.forEach((s: any) => {
-      csv += `"${s.nomor}","${s.pertanyaan.replace(/"/g, '""')}","${s.jawabanBenar}","${s.penjelasan.replace(/"/g, '""')}"\n`;
+      csv += `"${s.nomor}","${(s.pertanyaan || '').replace(/"/g, '""')}","${s.jawabanBenar}","${(s.penjelasan || '').replace(/"/g, '""')}"\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -79,12 +103,26 @@ const QuestionGenerator: React.FC = () => {
         </div>
 
         {/* Input Form */}
-        <div className="bg-white rounded-[40px] border border-slate-200 p-10 md:p-12 shadow-xl shadow-slate-200/50 no-print mb-12">
+        <div className="bg-white rounded-[40px] border border-slate-200 p-10 md:p-12 shadow-xl shadow-slate-200/50 no-print mb-12 relative overflow-hidden">
+          {loading && (
+            <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-30 flex flex-col items-center justify-center p-12 text-center animate-in fade-in">
+              <div className="w-20 h-20 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
+              <p className="text-2xl font-black text-slate-800 animate-pulse">{loadingStatus}</p>
+              <p className="text-slate-500 mt-2 font-medium">Proses kilat, sedang menyiapkan hasil terbaik untuk Anda.</p>
+            </div>
+          )}
+          
           <form onSubmit={handleSubmit} className="space-y-10">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <div className="space-y-2">
                 <label className="input-label">Mata Pelajaran</label>
-                <input className="serasi-input" placeholder="Misal: Biologi" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} required />
+                <input 
+                  className="serasi-input" 
+                  placeholder="Ketik nama mata pelajaran (Contoh: Biologi)" 
+                  value={formData.subject} 
+                  onChange={e => setFormData({...formData, subject: e.target.value})} 
+                  required 
+                />
               </div>
               <div className="space-y-2">
                 <label className="input-label">Kelas / Rombel</label>
@@ -121,8 +159,8 @@ const QuestionGenerator: React.FC = () => {
               </div>
             </div>
 
-            <button disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-6 rounded-2xl shadow-xl transition-all uppercase tracking-[0.2em]">
-              {loading ? 'PROSES MENYUSUN SOAL...' : 'HASILKAN SOAL ASESMEN'}
+            <button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-6 rounded-2xl shadow-xl transition-all uppercase tracking-[0.2em] disabled:opacity-50">
+              {loading ? 'SISTEM SEDANG BEKERJA...' : 'HASILKAN SOAL ASESMEN'}
             </button>
           </form>
         </div>
@@ -130,9 +168,8 @@ const QuestionGenerator: React.FC = () => {
         {/* Action Toolbar with Logos */}
         {result && (
           <div className="flex flex-wrap items-center justify-between gap-4 mb-8 no-print bg-white p-6 rounded-[32px] border border-slate-200 shadow-md">
-            <h3 className="text-xl font-black text-slate-800">Pratinjau Soal</h3>
+            <h3 className="text-xl font-black text-slate-800">Pratinjau Soal Berhasil Dibuat</h3>
             <div className="flex gap-4">
-              {/* PDF Button */}
               <button onClick={handlePrint} className="logo-btn hover:bg-red-50 border-red-100 group" title="Download PDF / Cetak">
                 <svg className="w-8 h-8 text-red-600 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -143,7 +180,6 @@ const QuestionGenerator: React.FC = () => {
                 </svg>
                 <span className="text-[10px] font-black text-red-600 mt-1 uppercase">PDF</span>
               </button>
-              {/* Word Button */}
               <button onClick={exportToWord} className="logo-btn hover:bg-blue-50 border-blue-100 group" title="Download MS Word">
                 <svg className="w-8 h-8 text-blue-600 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -152,7 +188,6 @@ const QuestionGenerator: React.FC = () => {
                 </svg>
                 <span className="text-[10px] font-black text-blue-600 mt-1 uppercase">Word</span>
               </button>
-              {/* Excel Button */}
               <button onClick={exportToExcel} className="logo-btn hover:bg-emerald-50 border-emerald-100 group" title="Download Excel">
                 <svg className="w-8 h-8 text-emerald-600 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -171,7 +206,7 @@ const QuestionGenerator: React.FC = () => {
             
             <div className="text-center border-b-4 border-double border-black pb-8 mb-12">
               <h2 className="text-2xl font-black uppercase tracking-widest">Soal Asesmen Sumatif</h2>
-              <h1 className="text-3xl font-black uppercase mt-2">{formData.subject}</h1>
+              <h1 className="text-3xl font-black uppercase mt-2">{formData.subject || 'MATA PELAJARAN'}</h1>
               <div className="mt-8 flex justify-center">
                 <table className="w-auto text-left font-bold text-sm border-none no-border printable-header-table">
                   <tbody>
@@ -194,33 +229,35 @@ const QuestionGenerator: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {result.kisiKisi?.map((k: any, idx: number) => (
+                  {result.kisiKisi?.length > 0 ? result.kisiKisi.map((k: any, idx: number) => (
                     <tr key={idx}>
                       <td className="border-2 border-black p-3 text-center font-bold align-top">{idx + 1}</td>
                       <td className="border-2 border-black p-3 text-sm font-bold uppercase align-top">{k.materi}</td>
                       <td className="border-2 border-black p-3 text-sm italic align-top">{k.indikator}</td>
                       <td className="border-2 border-black p-3 text-center font-black text-indigo-700 align-top">{k.level}</td>
                     </tr>
-                  ))}
+                  )) : (
+                    <tr><td colSpan={4} className="border-2 border-black p-8 text-center text-slate-400 italic">Tidak ada data kisi-kisi</td></tr>
+                  )}
                 </tbody>
               </table>
             </div>
 
             <div className="mb-20">
               <h3 className="text-center font-black text-xl mb-12 underline underline-offset-8 uppercase">BAGIAN II: INSTRUMEN SOAL UTAMA</h3>
-              <div className="space-y-10">
-                {result.soal?.map((s: any) => (
+              <div className="space-y-12">
+                {result.soal?.length > 0 ? result.soal.map((s: any) => (
                   <div key={s.nomor} className="question-block break-inside-avoid">
                     <div className="flex gap-4 items-start">
                       <span className="font-bold text-lg min-w-[2.5rem]">{s.nomor}.</span>
                       <div className="flex-1 space-y-4">
                         {s.stimulus && (
-                          <div className="p-6 bg-slate-50 border border-slate-200 text-slate-800 italic leading-relaxed text-base mb-4">
+                          <div className="p-6 bg-slate-50 border border-slate-200 text-slate-800 italic leading-relaxed text-base mb-4 rounded-xl">
                             {s.stimulus}
                           </div>
                         )}
                         <p className="text-lg font-bold text-slate-900 leading-snug">{s.pertanyaan}</p>
-                        {s.opsi && (
+                        {s.opsi && s.opsi.length > 0 && (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3 mt-4">
                             {s.opsi.map((o: string, i: number) => (
                               <div key={i} className="flex gap-3 text-base">
@@ -234,7 +271,9 @@ const QuestionGenerator: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <p className="text-center text-slate-400 italic py-10">Data soal belum digenerate dengan benar.</p>
+                )}
               </div>
             </div>
 
@@ -249,13 +288,15 @@ const QuestionGenerator: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {result.soal?.map((s: any) => (
+                  {result.soal?.length > 0 ? result.soal.map((s: any) => (
                     <tr key={s.nomor}>
                       <td className="border-2 border-black p-3 text-center font-bold align-top">{s.nomor}</td>
                       <td className="border-2 border-black p-3 text-center font-black text-emerald-700 align-top">{s.jawabanBenar}</td>
                       <td className="border-2 border-black p-3 text-sm italic text-slate-600 align-top">{s.penjelasan}</td>
                     </tr>
-                  ))}
+                  )) : (
+                    <tr><td colSpan={3} className="border-2 border-black p-8 text-center text-slate-400 italic">Kunci jawaban tidak tersedia</td></tr>
+                  )}
                 </tbody>
               </table>
             </div>

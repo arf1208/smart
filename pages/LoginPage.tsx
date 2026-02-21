@@ -1,11 +1,13 @@
 
 import React, { useState } from 'react';
+import { School } from 'lucide-react';
+import { APP_LOGO_URL } from '../constants';
 
 interface LoginPageProps {
   onLogin: () => void;
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
+export default function LoginPage({ onLogin }: LoginPageProps) {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('guru@smartschool.id');
   const [password, setPassword] = useState('password123');
@@ -13,7 +15,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate a professional login delay
+    // Simulasi proses login
     setTimeout(() => {
       onLogin();
       setLoading(false);
@@ -36,17 +38,29 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
       <div className="max-w-md w-full relative z-10 animate-in fade-in zoom-in duration-700">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-[24px] shadow-2xl shadow-blue-200 mb-6">
-             <span className="text-white font-black text-4xl">S</span>
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-[28px] shadow-2xl shadow-slate-200 mb-6 overflow-hidden border border-slate-100">
+             <img 
+               src={APP_LOGO_URL} 
+               alt="Logo" 
+               className="w-full h-full object-contain p-2"
+               onError={(e) => {
+                 e.currentTarget.style.display = 'none';
+                 const fallback = e.currentTarget.nextElementSibling;
+                 if (fallback) fallback.classList.remove('hidden');
+               }}
+             />
+             <School className="text-blue-600 w-12 h-12 hidden" />
           </div>
-          <h1 className="text-3xl font-black text-slate-800 tracking-tight">Smart School</h1>
+          <h1 className="text-4xl font-black text-slate-800 tracking-tight font-serif">Smart School</h1>
           <p className="text-slate-500 font-medium mt-2">Pusat Inovasi Guru Indonesia</p>
         </div>
 
         <div className="bg-white rounded-[32px] shadow-2xl shadow-blue-100/50 border border-slate-100 p-10">
-          <div className="mb-8">
-            <h2 className="text-xl font-bold text-slate-800">Selamat Datang Kembali</h2>
-            <p className="text-sm text-slate-400 font-medium mt-1">Silakan masuk ke akun Anda</p>
+          <div className="mb-8 flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold text-slate-800">Selamat Datang</h2>
+              <p className="text-sm text-slate-400 font-medium mt-1">Silakan masuk ke akun Anda</p>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -70,7 +84,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             <div className="space-y-2">
               <div className="flex items-center justify-between ml-1">
                 <label className="text-sm font-bold text-slate-700">Kata Sandi</label>
-                <a href="#" className="text-xs font-bold text-blue-600 hover:underline">Lupa Sandi?</a>
+                <button 
+                  type="button"
+                  onClick={() => alert('Fitur Pemulihan Kata Sandi: Silakan hubungi Admin IT sekolah Anda untuk reset password.')}
+                  className="text-xs font-bold text-blue-600 hover:underline"
+                >
+                  Lupa Sandi?
+                </button>
               </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
@@ -115,6 +135,4 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       </div>
     </div>
   );
-};
-
-export default LoginPage;
+}

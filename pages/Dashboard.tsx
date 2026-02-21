@@ -104,7 +104,10 @@ const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
               Panduan lengkap penggunaan Smart School tersedia di Pusat Edukasi kami.
             </p>
           </div>
-          <button className="mt-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-3">
+          <button 
+            onClick={() => setActiveTab('tutorial')}
+            className="mt-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-3"
+          >
             Buka Tutorial
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </button>

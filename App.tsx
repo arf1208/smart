@@ -8,6 +8,7 @@ import Library from './pages/Library';
 import LKPDGenerator from './pages/LKPDGenerator';
 import AdminDocsGenerator from './pages/AdminDocsGenerator';
 import LoginPage from './pages/LoginPage';
+import Tutorial from './pages/Tutorial';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -42,6 +43,8 @@ const App: React.FC = () => {
         return <><BackButton /><AdminDocsGenerator /></>;
       case 'library':
         return <><BackButton /><Library /></>;
+      case 'tutorial':
+        return <><BackButton /><Tutorial /></>;
       default:
         return <Dashboard setActiveTab={setActiveTab} />;
     }

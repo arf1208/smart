@@ -1,5 +1,7 @@
 
 import React from 'react';
+import { School } from 'lucide-react';
+import { APP_LOGO_URL } from '../constants';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -16,16 +18,35 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, onLo
           className="flex items-center gap-3 cursor-pointer group"
           onClick={() => setActiveTab('dashboard')}
         >
-          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200 group-hover:scale-105 transition-transform">
-            <span className="text-white font-black text-xl leading-none">S</span>
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-slate-200/50 group-hover:scale-105 transition-transform overflow-hidden border border-slate-100">
+            <img 
+              src={APP_LOGO_URL} 
+              alt="Logo" 
+              className="w-full h-full object-contain p-1.5"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                const fallback = e.currentTarget.nextElementSibling;
+                if (fallback) fallback.classList.remove('hidden');
+              }}
+            />
+            <School className="text-blue-600 w-6 h-6 hidden" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-slate-800 tracking-tight leading-none group-hover:text-blue-600 transition-colors">Smart School</h1>
+            <h1 className="text-xl font-black text-slate-800 tracking-tight leading-none group-hover:text-blue-600 transition-colors font-serif">Smart School</h1>
             <p className="text-[10px] text-blue-600 font-bold uppercase tracking-[0.2em] mt-1">Asisten Digital Guru</p>
           </div>
         </div>
         
         <div className="flex items-center gap-6">
+          <button 
+            onClick={() => setActiveTab('tutorial')}
+            className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
+              activeTab === 'tutorial' ? 'bg-blue-50 text-blue-600' : 'text-slate-500 hover:bg-slate-50'
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            Tutorial
+          </button>
           <div className="flex items-center">
              <button 
                onClick={onLogout}

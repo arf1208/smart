@@ -2,7 +2,21 @@
 export enum EducationLevel {
   SD = 'SD/MI',
   SMP = 'SMP/MTs',
-  SMA = 'SMA/SMK/MA'
+  SMA = 'SMA/MA',
+  SMK = 'SMK'
+}
+
+export enum SubjectCategory {
+  UMUM = 'Mata Pelajaran Umum',
+  KEJURUAN = 'Mata Pelajaran Kejuruan',
+  MUATAN_LOKAL = 'Muatan Lokal'
+}
+
+export interface Subject {
+  id: string;
+  name: string;
+  category: SubjectCategory;
+  subCategory?: string;
 }
 
 export enum Fase {
