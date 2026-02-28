@@ -11,6 +11,7 @@ interface Book {
   cover: string;
   synopsis: string;
   chapters: string[];
+  chapterContents?: Record<string, string>;
 }
 
 const books: Book[] = [
@@ -19,19 +20,66 @@ const books: Book[] = [
     id: 1, title: 'Matematika Tingkat Lanjut Kelas XI', author: 'Kemendikbudristek', level: 'SMA', fase: 'F', category: 'Matematika',
     cover: 'https://picsum.photos/400/600?seed=math11',
     synopsis: 'Buku ini membahas konsep matematika tingkat lanjut termasuk Polinomial, Matriks, dan Transformasi Geometri untuk mempersiapkan siswa ke jenjang pendidikan tinggi.',
-    chapters: ['Bab 1: Polinomial', 'Bab 2: Matriks', 'Bab 3: Geometri Analitik', 'Bab 4: Lingkaran']
+    chapters: ['Bab 1: Polinomial', 'Bab 2: Matriks', 'Bab 3: Geometri Analitik', 'Bab 4: Lingkaran'],
+    chapterContents: {
+      'Bab 1: Polinomial': `
+        <h2>Pengertian Polinomial</h2>
+        <p>Polinomial atau suku banyak adalah ekspresi matematika yang terdiri dari variabel dan koefisien. Bentuk umum polinomial derajat n adalah:</p>
+        <p className="bg-slate-100 p-4 rounded-xl font-mono my-4">P(x) = a_n x^n + a_{n-1} x^{n-1} + ... + a_1 x + a_0</p>
+        <h3>Operasi Polinomial</h3>
+        <p>Penjumlahan, pengurangan, dan perkalian polinomial dilakukan dengan menggabungkan suku-suku yang sejenis. Pembagian polinomial dapat dilakukan dengan metode bersusun atau metode Horner.</p>
+        <h3>Teorema Sisa</h3>
+        <p>Jika polinomial P(x) dibagi oleh (x - k), maka sisanya adalah P(k).</p>
+      `,
+      'Bab 2: Matriks': `
+        <h2>Konsep Dasar Matriks</h2>
+        <p>Matriks adalah susunan bilangan, simbol, atau ekspresi yang disusun dalam baris dan kolom sehingga membentuk suatu bangun persegi.</p>
+        <h3>Jenis-jenis Matriks</h3>
+        <ul>
+          <li>Matriks Baris: Matriks yang hanya terdiri dari satu baris.</li>
+          <li>Matriks Kolom: Matriks yang hanya terdiri dari satu kolom.</li>
+          <li>Matriks Persegi: Matriks yang jumlah baris dan kolomnya sama.</li>
+        </ul>
+        <h3>Determinan dan Invers</h3>
+        <p>Determinan matriks 2x2 [a b; c d] adalah ad - bc. Invers matriks digunakan untuk menyelesaikan sistem persamaan linear.</p>
+      `
+    }
   },
   { 
     id: 2, title: 'Fisika Terpadu Kelas X', author: 'Pusat Perbukuan RI', level: 'SMA', fase: 'E', category: 'Sains',
     cover: 'https://picsum.photos/400/600?seed=phys10',
     synopsis: 'Eksplorasi mendalam tentang hakikat fisika, pengukuran, energi terbarukan, dan pemanasan global dalam konteks kehidupan sehari-hari.',
-    chapters: ['Bab 1: Pengukuran', 'Bab 2: Energi Terbarukan', 'Bab 3: Pemanasan Global', 'Bab 4: Arus Searah']
+    chapters: ['Bab 1: Pengukuran', 'Bab 2: Energi Terbarukan', 'Bab 3: Pemanasan Global', 'Bab 4: Arus Searah'],
+    chapterContents: {
+      'Bab 1: Pengukuran': `
+        <h2>Hakikat Fisika dan Pengukuran</h2>
+        <p>Fisika adalah cabang sains yang mempelajari gejala alam secara eksperimental dan matematis. Pengukuran adalah membandingkan suatu besaran dengan satuan standar.</p>
+        <h3>Besaran Pokok dan Turunan</h3>
+        <p>Besaran pokok meliputi Panjang (m), Massa (kg), Waktu (s), Suhu (K), Kuat Arus (A), Intensitas Cahaya (cd), dan Jumlah Zat (mol).</p>
+        <h3>Angka Penting</h3>
+        <p>Angka penting adalah semua angka yang diperoleh dari hasil pengukuran, termasuk angka terakhir yang ditaksir.</p>
+      `
+    }
   },
   { 
     id: 3, title: 'Kimia: Struktur Atom & Tabel Periodik Kelas X', author: 'Kemendikbudristek', level: 'SMA', fase: 'E', category: 'Sains',
     cover: 'https://picsum.photos/400/600?seed=chem10',
     synopsis: 'Mempelajari dasar-dasar kimia mulai dari struktur atom, konfigurasi elektron, hingga hukum-hukum dasar kimia.',
-    chapters: ['Bab 1: Struktur Atom', 'Bab 2: Sistem Periodik', 'Bab 3: Ikatan Kimia', 'Bab 4: Stoikiometri']
+    chapters: ['Bab 1: Struktur Atom', 'Bab 2: Sistem Periodik', 'Bab 3: Ikatan Kimia', 'Bab 4: Stoikiometri'],
+    chapterContents: {
+      'Bab 1: Struktur Atom': `
+        <h2>Struktur Atom dan Perkembangannya</h2>
+        <p>Atom adalah unit terkecil dari materi yang mempertahankan sifat-sifat kimia suatu unsur. Teori atom telah berkembang dari model Dalton hingga mekanika kuantum.</p>
+        <h3>Partikel Penyusun Atom</h3>
+        <ul>
+          <li>Proton: Partikel bermuatan positif di inti atom.</li>
+          <li>Neutron: Partikel tidak bermuatan di inti atom.</li>
+          <li>Elektron: Partikel bermuatan negatif yang mengelilingi inti.</li>
+        </ul>
+        <h3>Nomor Atom dan Nomor Massa</h3>
+        <p>Nomor atom (Z) menunjukkan jumlah proton, sedangkan nomor massa (A) menunjukkan jumlah proton ditambah neutron.</p>
+      `
+    }
   },
   { 
     id: 12, title: 'Biologi: Evolusi & Hereditas Kelas XII', author: 'Kemendikbudristek', level: 'SMA', fase: 'F', category: 'Sains',
@@ -45,7 +93,19 @@ const books: Book[] = [
     id: 4, title: 'Ekonomi Makro & Mikro Kelas XI', author: 'Kemendikbudristek', level: 'SMA', fase: 'F', category: 'Sosial',
     cover: 'https://picsum.photos/400/600?seed=econ11',
     synopsis: 'Memahami mekanisme pasar, kebijakan fiskal, moneter, serta manajemen keuangan pribadi dan negara.',
-    chapters: ['Bab 1: Pendapatan Nasional', 'Bab 2: Pertumbuhan Ekonomi', 'Bab 3: Ketenagakerjaan', 'Bab 4: Kebijakan Moneter']
+    chapters: ['Bab 1: Pendapatan Nasional', 'Bab 2: Pertumbuhan Ekonomi', 'Bab 3: Ketenagakerjaan', 'Bab 4: Kebijakan Moneter'],
+    chapterContents: {
+      'Bab 1: Pendapatan Nasional': `
+        <h2>Konsep Pendapatan Nasional</h2>
+        <p>Pendapatan nasional adalah jumlah total pendapatan yang diterima oleh seluruh rumah tangga keluarga (RTK) di suatu negara dari penyerahan faktor-faktor produksi dalam satu periode tertentu.</p>
+        <h3>Metode Penghitungan</h3>
+        <ul>
+          <li><strong>Pendekatan Produksi:</strong> Menjumlahkan nilai tambah seluruh sektor.</li>
+          <li><strong>Pendekatan Pendapatan:</strong> Menjumlahkan upah, sewa, bunga, dan laba.</li>
+          <li><strong>Pendekatan Pengeluaran:</strong> Y = C + I + G + (X - M).</li>
+        </ul>
+      `
+    }
   },
   { 
     id: 5, title: 'Sosiologi: Masyarakat Digital Kelas X', author: 'Pusat Perbukuan RI', level: 'SMA', fase: 'E', category: 'Sosial',
@@ -71,13 +131,40 @@ const books: Book[] = [
     id: 6, title: 'Informatika Berbasis Proyek Kelas VII', author: 'Kemendikbudristek', level: 'SMP', fase: 'D', category: 'Teknologi',
     cover: 'https://picsum.photos/400/600?seed=cs7',
     synopsis: 'Panduan belajar berpikir komputasional, teknologi informasi, sistem komputer, dan dampaknya bagi masyarakat.',
-    chapters: ['Bab 1: Berpikir Komputasional', 'Bab 2: Teknologi Informasi', 'Bab 3: Sistem Komputer', 'Bab 4: Analisis Data']
+    chapters: ['Bab 1: Berpikir Komputasional', 'Bab 2: Teknologi Informasi', 'Bab 3: Sistem Komputer', 'Bab 4: Analisis Data'],
+    chapterContents: {
+      'Bab 1: Berpikir Komputasional': `
+        <h2>Apa itu Berpikir Komputasional?</h2>
+        <p>Berpikir komputasional (Computational Thinking) adalah metode penyelesaian masalah yang melibatkan teknik yang digunakan oleh ilmuwan komputer.</p>
+        <h3>4 Pilar Berpikir Komputasional</h3>
+        <ol>
+          <li><strong>Dekomposisi:</strong> Memecah masalah besar menjadi bagian-bagian kecil.</li>
+          <li><strong>Pengenalan Pola:</strong> Mencari kesamaan di antara masalah.</li>
+          <li><strong>Abstraksi:</strong> Fokus pada informasi penting saja.</li>
+          <li><strong>Algoritma:</strong> Menyusun langkah-langkah penyelesaian.</li>
+        </ol>
+      `
+    }
   },
   { 
     id: 7, title: 'Bahasa Inggris: English for Bright Class VIII', author: 'Kemendikbudristek', level: 'SMP', fase: 'D', category: 'Bahasa',
     cover: 'https://picsum.photos/400/600?seed=eng8',
     synopsis: 'Focusing on daily conversations, storytelling, and procedural texts to enhance students confidence in speaking English.',
-    chapters: ['Unit 1: Celebrating Independence', 'Unit 2: Kindness and Friendship', 'Unit 3: Save the Environment', 'Unit 4: No Littering']
+    chapters: ['Unit 1: Celebrating Independence', 'Unit 2: Kindness and Friendship', 'Unit 3: Save the Environment', 'Unit 4: No Littering'],
+    chapterContents: {
+      'Unit 1: Celebrating Independence': `
+        <h2>Independence Day Celebration</h2>
+        <p>In this unit, we will learn how to describe past events related to Independence Day celebrations in Indonesia.</p>
+        <h3>Vocabulary</h3>
+        <ul>
+          <li>Flag hoisting ceremony (Upacara bendera)</li>
+          <li>Panjat pinang (Greasy pole climbing)</li>
+          <li>Sack race (Balap karung)</li>
+        </ul>
+        <h3>Grammar: Simple Past Tense</h3>
+        <p>We use the simple past tense to talk about things that happened in the past. Example: "We <em>joined</em> the parade yesterday."</p>
+      `
+    }
   },
   { 
     id: 8, title: 'IPA Terpadu: Eksplorasi Alam Kelas IX', author: 'Pusat Perbukuan RI', level: 'SMP', fase: 'D', category: 'Sains',
@@ -109,13 +196,33 @@ const books: Book[] = [
     id: 9, title: 'IPAS (IPA & Sosial) Kelas IV', author: 'Kemendikbudristek', level: 'SD', fase: 'B', category: 'Umum',
     cover: 'https://picsum.photos/400/600?seed=ipas4',
     synopsis: 'Buku yang menggabungkan konsep alam dan sosial untuk membantu siswa memahami lingkungan sekitar dengan lebih holistik.',
-    chapters: ['Bab 1: Tumbuhan Sumber Kehidupan', 'Bab 2: Wujud Zat', 'Bab 3: Gaya di Sekitar Kita', 'Bab 4: Mengubah Bentuk Energi']
+    chapters: ['Bab 1: Tumbuhan Sumber Kehidupan', 'Bab 2: Wujud Zat', 'Bab 3: Gaya di Sekitar Kita', 'Bab 4: Mengubah Bentuk Energi'],
+    chapterContents: {
+      'Bab 1: Tumbuhan Sumber Kehidupan': `
+        <h2>Bagian Tubuh Tumbuhan</h2>
+        <p>Tumbuhan memiliki bagian-bagian utama yang membantu mereka bertahan hidup dan tumbuh.</p>
+        <h3>Akar, Batang, dan Daun</h3>
+        <p>Akar menyerap air, batang menyalurkan makanan, dan daun adalah tempat fotosintesis.</p>
+        <h3>Proses Fotosintesis</h3>
+        <p>Tumbuhan memasak makanannya sendiri menggunakan cahaya matahari, air, dan karbon dioksida untuk menghasilkan oksigen dan karbohidrat.</p>
+      `
+    }
   },
   { 
     id: 10, title: 'Bahasa Indonesia: Lihat Sekitar Kelas II', author: 'Pusat Perbukuan RI', level: 'SD', fase: 'A', category: 'Bahasa',
     cover: 'https://picsum.photos/400/600?seed=indo2',
     synopsis: 'Mengajarkan kemampuan menyimak, membaca, berbicara, dan menulis melalui cerita interaktif dan gambar menarik.',
-    chapters: ['Bab 1: Mengenal Perasaan', 'Bab 2: Menjaga Kesehatan', 'Bab 3: Berhati-hati di Mana Saja', 'Bab 4: Keluargaku Unik']
+    chapters: ['Bab 1: Mengenal Perasaan', 'Bab 2: Menjaga Kesehatan', 'Bab 3: Berhati-hati di Mana Saja', 'Bab 4: Keluargaku Unik'],
+    chapterContents: {
+      'Bab 1: Mengenal Perasaan': `
+        <h2>Ayo Mengenal Perasaan!</h2>
+        <p>Setiap orang punya perasaan. Ada saatnya kita merasa senang, sedih, marah, atau takut.</p>
+        <h3>Cerita Si Kancil yang Senang</h3>
+        <p>Suatu hari, Kancil mendapatkan banyak buah apel. Kancil merasa sangat <strong>senang</strong>. Dia melompat-lompat kegirangan.</p>
+        <h3>Tugas Literasi</h3>
+        <p>Gambarlah wajahmu saat sedang merasa senang!</p>
+      `
+    }
   },
   { 
     id: 11, title: 'Seni Rupa & Kreativitas Kelas V', author: 'Kemendikbudristek', level: 'SD', fase: 'C', category: 'Seni',
@@ -185,6 +292,8 @@ const Library: React.FC = () => {
   const [filter, setFilter] = useState('Semua');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [activeChapter, setActiveChapter] = useState<string | null>(null);
+  const [readerTheme, setReaderTheme] = useState<'light' | 'sepia' | 'dark'>('light');
 
   const filteredBooks = useMemo(() => {
     return books.filter(book => {
@@ -196,12 +305,101 @@ const Library: React.FC = () => {
     });
   }, [filter, searchTerm]);
 
+  // Chapter Reader View
+  if (selectedBook && activeChapter) {
+    const content = selectedBook.chapterContents?.[activeChapter] || `
+      <div className="py-20 text-center">
+        <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg className="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+        </div>
+        <h3 className="text-xl font-black text-slate-800">Konten Sedang Disiapkan</h3>
+        <p className="text-slate-500 mt-2">Materi lengkap untuk ${activeChapter} sedang dalam proses sinkronisasi digital.</p>
+      </div>
+    `;
+
+    return (
+      <div className="max-w-5xl mx-auto py-8 px-6 animate-in slide-in-from-bottom-4 duration-500">
+        <div className="flex items-center justify-between mb-10">
+          <button 
+            onClick={() => setActiveChapter(null)}
+            className="flex items-center gap-2 text-slate-500 font-bold hover:text-blue-600 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+            Kembali ke Detail Buku
+          </button>
+          <div className="flex items-center gap-4">
+            <button className="p-3 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-blue-600 transition-all shadow-sm">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+            </button>
+            <button className="p-3 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-blue-600 transition-all shadow-sm">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </button>
+          </div>
+        </div>
+
+        <div className={`rounded-[48px] shadow-2xl border transition-all duration-500 p-12 md:p-20 ${
+          readerTheme === 'light' ? 'bg-white border-slate-100' : 
+          readerTheme === 'sepia' ? 'bg-[#f4ecd8] border-[#e6d5b8]' : 
+          'bg-slate-900 border-slate-800'
+        }`}>
+          <div className="max-w-3xl mx-auto">
+            <div className="mb-12 text-center">
+              <span className={`font-black text-[10px] uppercase tracking-[0.3em] mb-4 block ${
+                readerTheme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+              }`}>{selectedBook.title}</span>
+              <h1 className={`text-4xl font-black tracking-tight ${
+                readerTheme === 'dark' ? 'text-white' : 'text-slate-900'
+              }`}>{activeChapter}</h1>
+              <div className="w-20 h-1.5 bg-blue-600 mx-auto mt-8 rounded-full"></div>
+            </div>
+
+            <div className={`prose max-w-none prose-headings:font-black prose-p:leading-relaxed prose-p:text-lg ${
+              readerTheme === 'light' ? 'prose-slate prose-headings:text-slate-900 prose-p:text-slate-600' : 
+              readerTheme === 'sepia' ? 'prose-stone prose-headings:text-[#5f4b32] prose-p:text-[#5f4b32]' : 
+              'prose-invert prose-headings:text-white prose-p:text-slate-300'
+            }`}>
+              <div dangerouslySetInnerHTML={{ __html: content }} />
+            </div>
+
+            <div className={`mt-20 pt-10 border-t flex items-center justify-between ${
+              readerTheme === 'dark' ? 'border-slate-800' : 'border-slate-100'
+            }`}>
+              <button className="flex items-center gap-3 text-slate-400 font-bold hover:text-blue-500 transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                Bab Sebelumnya
+              </button>
+              
+              <div className="flex items-center gap-2 bg-slate-100/50 p-1.5 rounded-2xl">
+                {(['light', 'sepia', 'dark'] as const).map(t => (
+                  <button 
+                    key={t}
+                    onClick={() => setReaderTheme(t)}
+                    className={`w-8 h-8 rounded-xl border transition-all ${
+                      readerTheme === t ? 'border-blue-500 scale-110 shadow-lg' : 'border-transparent'
+                    } ${
+                      t === 'light' ? 'bg-white' : t === 'sepia' ? 'bg-[#f4ecd8]' : 'bg-slate-900'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <button className="flex items-center gap-3 text-blue-600 font-bold hover:text-blue-700 transition-colors">
+                Bab Selanjutnya
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Reader View (Detailed Book Access)
   if (selectedBook) {
     return (
       <div className="max-w-7xl mx-auto py-8 px-6 animate-in fade-in duration-500">
         <button 
-          onClick={() => setSelectedBook(null)}
+          onClick={() => {setSelectedBook(null); setActiveChapter(null);}}
           className="flex items-center gap-2 text-blue-600 font-bold mb-8 hover:bg-blue-50 px-4 py-2 rounded-xl transition-all group"
         >
           <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
@@ -284,7 +482,7 @@ const Library: React.FC = () => {
                     <div 
                       key={idx} 
                       className="flex items-center justify-between p-5 bg-slate-50 border border-slate-100 rounded-2xl hover:bg-white hover:shadow-xl hover:shadow-blue-50 hover:-translate-y-1 transition-all cursor-pointer group"
-                      onClick={() => alert(`Membuka ${chapter}...`)}
+                      onClick={() => setActiveChapter(chapter)}
                     >
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center font-black text-blue-600 text-sm shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all">

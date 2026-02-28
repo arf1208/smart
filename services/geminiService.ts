@@ -28,7 +28,9 @@ const handleError = (error: any) => {
 };
 
 const getApiKey = () => {
-  const key = process.env.GEMINI_API_KEY || process.env.API_KEY;
+  // Prioritaskan environment variable untuk keamanan. 
+  // API Key yang Anda berikan digunakan sebagai fallback jika environment tidak diatur.
+  const key = process.env.GEMINI_API_KEY || process.env.API_KEY || "AIzaSyB3kGTjh5ZyUXfemPlccgScKTwMEph1xAE";
   if (!key) {
     throw new Error("API Key tidak ditemukan. Pastikan GEMINI_API_KEY sudah diatur di environment variables.");
   }
