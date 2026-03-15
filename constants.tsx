@@ -59,7 +59,7 @@ export const SUBJECTS: Subject[] = [
   { id: 'mulo-sunda', name: 'Bahasa Sunda', category: SubjectCategory.MUATAN_LOKAL },
 ];
 
-export const APP_LOGO_URL = "https://image2url.com/r2/default/images/1771660712554-f01150ae-9d91-402b-883f-9f4b4150aa7b.jpeg";
+export const APP_LOGO_URL = "https://image2url.com/r2/default/images/1773582348257-ee857a71-2d8f-4afb-a7dc-e3e14be978dd.jpeg";
 
 export const Icons = {
   Dashboard: (props: React.SVGProps<SVGSVGElement>) => (

@@ -9,11 +9,15 @@ interface LoginPageProps {
 
 export default function LoginPage({ onLogin }: LoginPageProps) {
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('guru@smartschool.id');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      alert('Silakan masukkan email dan kata sandi Anda.');
+      return;
+    }
     setLoading(true);
     // Simulasi proses login
     setTimeout(() => {
@@ -71,11 +75,11 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" /></svg>
                 </div>
                 <input 
-                  type="email" 
+                  type="text" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-12 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-medium"
-                  placeholder="name@school.id"
+                  placeholder="Masukkan email/username"
                   required
                 />
               </div>
@@ -122,11 +126,24 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
               )}
             </button>
           </form>
+
+          <div className="mt-8 pt-8 border-t border-slate-100 text-center">
+            <p className="text-sm text-slate-500 font-medium mb-4">Belum punya akses Smart School?</p>
+            <a 
+              href="https://sekolah-ku.myscalev.com/c/checkout?variant_ids=456638&qty=1" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex flex-col items-center w-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 py-4 px-6 rounded-2xl transition-all group"
+            >
+              <span className="text-xs font-bold uppercase tracking-wider opacity-70">Aktivasi Akun Selamanya</span>
+              <span className="text-lg font-black mt-1 group-hover:scale-105 transition-transform">Beli Akses — Rp 49.000</span>
+            </a>
+          </div>
         </div>
 
         <div className="text-center mt-8 space-y-1">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-            Copyright &copy; 2026 Smart School
+            &copy; 2026 Arftech. dev
           </p>
           <p className="text-[10px] font-medium text-slate-300">
             Inovasi Digital Pendidikan Indonesia • All rights reserved.
