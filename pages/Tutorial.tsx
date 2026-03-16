@@ -48,12 +48,14 @@ const Tutorial: React.FC = () => {
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
           <h3 className="text-2xl font-black mb-4">Masih Butuh Bantuan?</h3>
           <p className="text-blue-100 font-medium mb-8">Tim support kami siap membantu Anda 24/7 melalui saluran WhatsApp resmi.</p>
-          <button 
-            onClick={() => window.open('https://wa.me/6281234567890', '_blank')}
-            className="px-10 py-4 bg-white text-blue-600 font-black rounded-2xl shadow-xl hover:scale-105 transition-all"
+          <a 
+            href="https://wa.me/6281234567890"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-10 py-4 bg-white text-blue-600 font-black rounded-2xl shadow-xl hover:scale-105 transition-all"
           >
             Hubungi Support
-          </button>
+          </a>
         </div>
       </div>
     </div>

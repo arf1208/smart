@@ -28,9 +28,7 @@ const handleError = (error: any) => {
 };
 
 const getApiKey = () => {
-  // Prioritaskan environment variable untuk keamanan. 
-  // API Key yang Anda berikan digunakan sebagai fallback jika environment tidak diatur.
-  const key = process.env.GEMINI_API_KEY || process.env.API_KEY || "AIzaSyB3kGTjh5ZyUXfemPlccgScKTwMEph1xAE";
+  const key = process.env.GEMINI_API_KEY || process.env.API_KEY;
   if (!key) {
     throw new Error("API Key tidak ditemukan. Pastikan GEMINI_API_KEY sudah diatur di environment variables.");
   }
@@ -146,7 +144,17 @@ Ketentuan Khusus:
 
     const text = response.text?.trim();
     if (!text) throw new Error("Model returned empty response");
-    return JSON.parse(text);
+    
+    // Handle potential markdown code blocks
+    const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || text.match(/```\s*([\s\S]*?)\s*```/);
+    const jsonString = jsonMatch ? jsonMatch[1] : text;
+    
+    try {
+      return JSON.parse(jsonString);
+    } catch (parseError) {
+      console.error("JSON Parse Error:", parseError, "Raw Text:", text);
+      throw new Error("Gagal mengurai hasil generate. Silakan coba lagi.");
+    }
   } catch (err) {
     throw new Error(handleError(err));
   }

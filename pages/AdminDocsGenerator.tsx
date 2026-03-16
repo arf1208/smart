@@ -3,8 +3,10 @@ import React, { useState } from 'react';
 import { generateAdminDocs } from '../services/geminiService';
 import { EducationLevel, Fase } from '../types';
 import { SUBJECTS } from '../constants';
+import { useToast } from '../context/ToastContext';
 
 const AdminDocsGenerator: React.FC = () => {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -59,8 +61,9 @@ const AdminDocsGenerator: React.FC = () => {
     try {
       const data = await generateAdminDocs(formData);
       setResult(data || 'Gagal generate konten.');
+      showToast(`${formData.docType} berhasil dibuat!`, 'success');
     } catch (err: any) {
-      alert('Terjadi kesalahan: ' + (err.message || 'Silakan coba lagi.'));
+      showToast(err.message || 'Terjadi kesalahan. Silakan coba lagi.', 'error');
     } finally {
       setLoading(false);
     }
@@ -139,7 +142,14 @@ const AdminDocsGenerator: React.FC = () => {
                   </svg>
                   <span className="text-[10px] font-black text-blue-600 mt-1 uppercase">Word</span>
                 </button>
-                <button onClick={() => { navigator.clipboard.writeText(result); alert('Tersalin ke clipboard!'); }} className="logo-btn hover:bg-slate-50 border-slate-200 group" title="Salin Teks">
+                <button onClick={async () => { 
+                  try {
+                    await navigator.clipboard.writeText(result); 
+                    showToast('Tersalin ke clipboard!', 'success');
+                  } catch (err) {
+                    showToast('Gagal menyalin teks.', 'error');
+                  }
+                }} className="logo-btn hover:bg-slate-50 border-slate-200 group" title="Salin Teks">
                   <svg className="w-8 h-8 text-slate-600 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>

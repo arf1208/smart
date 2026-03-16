@@ -2,28 +2,47 @@
 import React, { useState } from 'react';
 import { School } from 'lucide-react';
 import { APP_LOGO_URL } from '../constants';
+import { useToast } from '../context/ToastContext';
 
 interface LoginPageProps {
   onLogin: () => void;
 }
 
 export default function LoginPage({ onLogin }: LoginPageProps) {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      alert('Silakan masukkan email dan kata sandi Anda.');
+      showToast('Silakan masukkan email dan kata sandi Anda.', 'error');
       return;
     }
     setLoading(true);
-    // Simulasi proses login
-    setTimeout(() => {
-      onLogin();
+    
+    try {
+      // Menggunakan login.php agar kompatibel saat di-deploy ke hosting PHP
+      const response = await fetch('login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        showToast(`Selamat datang, ${data.user.name}!`, 'success');
+        onLogin();
+      } else {
+        showToast(data.message, 'error');
+      }
+    } catch (error) {
+      showToast('Gagal terhubung ke server.', 'error');
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   };
 
   return (
@@ -46,6 +65,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
              <img 
                src={APP_LOGO_URL} 
                alt="Logo" 
+               referrerPolicy="no-referrer"
                className="w-full h-full object-contain p-2"
                onError={(e) => {
                  e.currentTarget.style.display = 'none';
@@ -90,7 +110,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                 <label className="text-sm font-bold text-slate-700">Kata Sandi</label>
                 <button 
                   type="button"
-                  onClick={() => alert('Fitur Pemulihan Kata Sandi: Silakan hubungi Admin IT sekolah Anda untuk reset password.')}
+                  onClick={() => showToast('Fitur Pemulihan Kata Sandi: Silakan hubungi Admin IT sekolah Anda untuk reset password.', 'info')}
                   className="text-xs font-bold text-blue-600 hover:underline"
                 >
                   Lupa Sandi?

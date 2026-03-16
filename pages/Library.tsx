@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
+import { useToast } from '../context/ToastContext';
 
 interface Book {
   id: number;
@@ -289,6 +290,7 @@ const books: Book[] = [
 ];
 
 const Library: React.FC = () => {
+  const { showToast } = useToast();
   const [filter, setFilter] = useState('Semua');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
@@ -411,7 +413,7 @@ const Library: React.FC = () => {
             {/* Sidebar / Cover Area */}
             <div className="lg:col-span-4 bg-slate-50 p-12 flex flex-col items-center border-r border-slate-100">
               <div className="w-full aspect-[2/3] rounded-[32px] overflow-hidden shadow-2xl mb-8 relative group/cover">
-                <img src={selectedBook.cover} className="w-full h-full object-cover" alt={selectedBook.title} />
+                <img src={selectedBook.cover} referrerPolicy="no-referrer" className="w-full h-full object-cover" alt={selectedBook.title} />
                 <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover/cover:opacity-100 transition-opacity"></div>
               </div>
               
@@ -435,7 +437,7 @@ const Library: React.FC = () => {
                     link.download = `${selectedBook.title}.pdf`;
                     link.target = '_blank';
                     link.click();
-                    alert('Mengunduh buku: ' + selectedBook.title);
+                    showToast('Mengunduh buku: ' + selectedBook.title, 'success');
                   }}
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
@@ -584,7 +586,7 @@ const Library: React.FC = () => {
                    </div>
                 </div>
                 
-                <img src={book.cover} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={book.title} />
+                <img src={book.cover} referrerPolicy="no-referrer" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={book.title} />
                 
                 {/* Level Badge on Image (Floating) */}
                 <div className="absolute top-4 right-4">

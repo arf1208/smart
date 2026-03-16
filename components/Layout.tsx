@@ -22,6 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, onLo
             <img 
               src={APP_LOGO_URL} 
               alt="Logo" 
+              referrerPolicy="no-referrer"
               className="w-full h-full object-contain p-1.5"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';

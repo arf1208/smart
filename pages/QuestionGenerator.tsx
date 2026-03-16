@@ -3,8 +3,10 @@ import React, { useState } from 'react';
 import { generateQuestions } from '../services/geminiService';
 import { EducationLevel, Fase } from '../types';
 import { SUBJECTS } from '../constants';
+import { useToast } from '../context/ToastContext';
 
 const QuestionGenerator: React.FC = () => {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState('');
   const [result, setResult] = useState<any | null>(null);
@@ -45,9 +47,10 @@ const QuestionGenerator: React.FC = () => {
         throw new Error("Hasil generate kosong. Silakan coba lagi.");
       }
       setResult(data);
+      showToast('Bank Soal berhasil dibuat!', 'success');
     } catch (err: any) {
       console.error(err);
-      alert('Gagal generate soal: ' + (err.message || 'Terjadi kesalahan sistem.'));
+      showToast(err.message || 'Terjadi kesalahan sistem. Silakan coba lagi.', 'error');
     } finally {
       clearInterval(interval);
       setLoading(false);

@@ -123,6 +123,7 @@ const App: React.FC = () => {
                 <motion.img 
                   src={APP_LOGO_URL} 
                   alt="Logo" 
+                  referrerPolicy="no-referrer"
                   className="w-full h-full object-contain"
                   animate={{ 
                     y: [0, -5, 0],
@@ -206,10 +207,12 @@ const App: React.FC = () => {
           ) : (
             <Layout activeTab={activeTab} setActiveTab={setActiveTab} onLogout={() => setIsLoggedIn(false)}>
               {renderContent()}
-              <footer className="mt-12 py-8 border-t border-slate-200 text-center no-print">
-                <p className="text-slate-400 text-sm">
-                  Copyright &copy; 2026 Smart School. All rights reserved. <br/>
-                  Inovasi Digital Pendidikan Indonesia •
+              <footer className="mt-12 py-12 border-t border-slate-100 text-center no-print space-y-1">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  &copy; 2026 Arftech. dev
+                </p>
+                <p className="text-[10px] font-medium text-slate-300">
+                  Inovasi Digital Pendidikan Indonesia • All rights reserved.
                 </p>
               </footer>
             </Layout>
