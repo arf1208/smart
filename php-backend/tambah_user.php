@@ -1,9 +1,9 @@
 <?php
 // --- KONFIGURASI ---
 $host = "localhost";
-$user = "root"; 
-$pass = "";     
-$db   = "smart_school"; 
+$user = "sekb7418_sekb7418_smart"; 
+$pass = "fd24u4fUTcmH44";     
+$db   = "sekb7418_sekb7418_smart"; 
 
 // PASSWORD UNTUK MENGAKSES HALAMAN INI (Ganti sesuai keinginan Anda)
 $HALAMAN_PASSWORD = "admin_smart_school_2026";
