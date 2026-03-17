@@ -46,17 +46,47 @@ export const generateModulAjar = async (params: {
 }) => {
   try {
     const ai = new GoogleGenAI({ apiKey: getApiKey() });
-    const prompt = `Buatkan MODUL AJAR KURIKULUM MERDEKA lengkap dan mendalam.
+    const prompt = `Buatkan MODUL AJAR KURIKULUM MERDEKA yang sangat lengkap, sistematis, dan mendalam.
 - Guru: ${params.teacherName}
 - Mapel: ${params.subject}
 - Materi: ${params.topic}
 - Fase: ${params.fase}
+- Jenjang/Level: ${params.level}
 - Durasi: ${params.duration}
 
-Struktur Modul WAJIB mencakup:
-1. Informasi Umum (Identitas, Kompetensi Awal, Profil Pelajar Pancasila, Sarana Prasarana)
-2. Komponen Inti (Tujuan Pembelajaran, Pemahaman Bermakna, Pertanyaan Pemantik, Kegiatan Pembelajaran Lengkap, Asesmen)
-3. Lampiran (LKPD, Pengayaan & Remedial, Glosarium, Daftar Pustaka)`;
+Struktur Modul WAJIB mencakup komponen berikut secara detail:
+
+I. INFORMASI UMUM
+1. Identitas Modul: Nama penyusun, institusi, tahun, jenjang, kelas, dan alokasi waktu.
+2. Kompetensi Awal: Pengetahuan/keterampilan yang perlu dimiliki siswa sebelum mempelajari topik ini.
+3. Profil Pelajar Pancasila: Sebutkan dimensi yang berkaitan (misal: Mandiri, Bernalar Kritis, Kreatif).
+4. Sarana dan Prasarana: Fasilitas dan bahan yang dibutuhkan.
+5. Target Peserta Didik: (Reguler/Tipikal, Kesulitan Belajar, atau Pencapaian Tinggi).
+6. Model Pembelajaran: Sebutkan model yang digunakan (misal: PBL, PJBL, Discovery Learning).
+
+II. KOMPONEN INTI
+1. Tujuan Pembelajaran: Harus spesifik dan terukur.
+2. Pemahaman Bermakna: Manfaat yang akan diperoleh siswa setelah proses pembelajaran.
+3. Pertanyaan Pemantik: Pertanyaan untuk menumbuhkan rasa ingin tahu siswa.
+4. Persiapan Pembelajaran: Langkah-langkah teknis sebelum mengajar.
+5. Kegiatan Pembelajaran:
+   - Pendahuluan (Apersepsi, Motivasi)
+   - Inti (Langkah-langkah sesuai model pembelajaran)
+   - Penutup (Refleksi, Kesimpulan, Tindak Lanjut)
+6. Asesmen:
+   - Asesmen sebelum pembelajaran (Diagnostik)
+   - Asesmen selama proses pembelajaran (Formatif)
+   - Asesmen pada akhir proses pembelajaran (Sumatif)
+7. Pengayaan dan Remedial: Strategi untuk siswa yang butuh tantangan lebih atau bantuan tambahan.
+8. Refleksi Peserta Didik dan Guru.
+
+III. LAMPIRAN
+1. Lembar Kerja Peserta Didik (LKPD): Ringkasan tugas/aktivitas siswa.
+2. Bahan Bacaan Guru & Peserta Didik: Ringkasan materi esensial.
+3. Glosarium: Istilah-istilah penting dan artinya.
+4. Daftar Pustaka.
+
+Gunakan format yang rapi, profesional, dan mudah dibaca oleh guru.`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
