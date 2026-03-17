@@ -28,9 +28,10 @@ const handleError = (error: any) => {
 };
 
 const getApiKey = () => {
-  const key = process.env.GEMINI_API_KEY || process.env.API_KEY;
+  // Cek MY_API_KEY (kunci custom user) dulu, kalau tidak ada pakai GEMINI_API_KEY (sistem)
+  const key = process.env.MY_API_KEY || process.env.GEMINI_API_KEY;
   if (!key) {
-    throw new Error("API Key tidak ditemukan. Pastikan GEMINI_API_KEY sudah diatur di environment variables.");
+    throw new Error("API Key tidak ditemukan. Silakan tambahkan 'MY_API_KEY' di menu Secrets.");
   }
   return key;
 };
@@ -58,11 +59,11 @@ Struktur Modul WAJIB mencakup:
 3. Lampiran (LKPD, Pengayaan & Remedial, Glosarium, Daftar Pustaka)`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.1-pro-preview',
       contents: prompt,
       config: { 
         systemInstruction: SYSTEM_INSTRUCTION, 
-        temperature: 0.5
+        temperature: 0.7
       }
     });
     return response.text;
@@ -100,12 +101,12 @@ Ketentuan Khusus:
 - Pastikan JSON tertutup dengan sempurna (valid JSON).`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.1-pro-preview',
       contents: prompt,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         responseMimeType: "application/json",
-        temperature: 0.3, 
+        temperature: 0.4, 
         responseSchema: {
           type: Type.OBJECT,
           required: ["kisiKisi", "soal"],
@@ -172,7 +173,7 @@ export const generateLKPD = async (params: {
     const prompt = `Buatkan LKPD (Lembar Kerja Peserta Didik) interaktif dan eksploratif untuk ${params.subject}, topik: ${params.topic}. 
 Sertakan langkah kerja praktikum/diskusi yang jelas, tabel pengamatan, dan pertanyaan analisis.`;
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.1-pro-preview',
       contents: prompt,
       config: { 
         systemInstruction: SYSTEM_INSTRUCTION
@@ -196,7 +197,7 @@ export const generateAdminDocs = async (params: {
     const prompt = `Buatkan dokumen ${params.docType} resmi Kurikulum Merdeka untuk mata pelajaran ${params.subject} Fase ${params.fase}. 
 Pastikan struktur tabel rapi dan substansi sesuai dengan standar Kemendikbudristek terbaru.`;
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.1-pro-preview',
       contents: prompt,
       config: { 
         systemInstruction: SYSTEM_INSTRUCTION
