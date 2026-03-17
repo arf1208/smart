@@ -59,7 +59,7 @@ Struktur Modul WAJIB mencakup:
 3. Lampiran (LKPD, Pengayaan & Remedial, Glosarium, Daftar Pustaka)`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.1-pro-preview',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: { 
         systemInstruction: SYSTEM_INSTRUCTION, 
@@ -101,7 +101,7 @@ Ketentuan Khusus:
 - Pastikan JSON tertutup dengan sempurna (valid JSON).`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.1-pro-preview',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
@@ -173,7 +173,7 @@ export const generateLKPD = async (params: {
     const prompt = `Buatkan LKPD (Lembar Kerja Peserta Didik) interaktif dan eksploratif untuk ${params.subject}, topik: ${params.topic}. 
 Sertakan langkah kerja praktikum/diskusi yang jelas, tabel pengamatan, dan pertanyaan analisis.`;
     const response = await ai.models.generateContent({
-      model: 'gemini-3.1-pro-preview',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: { 
         systemInstruction: SYSTEM_INSTRUCTION
@@ -197,7 +197,7 @@ export const generateAdminDocs = async (params: {
     const prompt = `Buatkan dokumen ${params.docType} resmi Kurikulum Merdeka untuk mata pelajaran ${params.subject} Fase ${params.fase}. 
 Pastikan struktur tabel rapi dan substansi sesuai dengan standar Kemendikbudristek terbaru.`;
     const response = await ai.models.generateContent({
-      model: 'gemini-3.1-pro-preview',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: { 
         systemInstruction: SYSTEM_INSTRUCTION
