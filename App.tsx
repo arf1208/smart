@@ -17,6 +17,7 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -37,7 +38,10 @@ const App: React.FC = () => {
     const BackButton = () => (
       <div className="max-w-7xl mx-auto px-6 pt-8 no-print">
         <button 
-          onClick={() => setActiveTab('dashboard')}
+          onClick={() => {
+            setActiveTab('dashboard');
+            setSearchTerm('');
+          }}
           className="group flex items-center gap-3 px-6 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 hover:text-blue-600 transition-all shadow-sm"
         >
           <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,7 +54,7 @@ const App: React.FC = () => {
 
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard setActiveTab={setActiveTab} />;
+        return <Dashboard setActiveTab={setActiveTab} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />;
       case 'modul':
         return <><BackButton /><ModulAjarGenerator /></>;
       case 'soal':
@@ -60,11 +64,11 @@ const App: React.FC = () => {
       case 'admin-docs':
         return <><BackButton /><AdminDocsGenerator /></>;
       case 'library':
-        return <><BackButton /><Library /></>;
+        return <><BackButton /><Library searchTerm={searchTerm} setSearchTerm={setSearchTerm} /></>;
       case 'tutorial':
         return <><BackButton /><Tutorial /></>;
       default:
-        return <Dashboard setActiveTab={setActiveTab} />;
+        return <Dashboard setActiveTab={setActiveTab} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />;
     }
   };
 
@@ -205,7 +209,13 @@ const App: React.FC = () => {
           {!isLoggedIn ? (
             <LoginPage onLogin={() => setIsLoggedIn(true)} />
           ) : (
-            <Layout activeTab={activeTab} setActiveTab={setActiveTab} onLogout={() => setIsLoggedIn(false)}>
+            <Layout 
+              activeTab={activeTab} 
+              setActiveTab={setActiveTab} 
+              onLogout={() => setIsLoggedIn(false)}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+            >
               {renderContent()}
               <footer className="mt-12 py-12 border-t border-slate-100 text-center no-print space-y-1">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">

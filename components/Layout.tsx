@@ -8,15 +8,20 @@ interface LayoutProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onLogout: () => void;
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, onLogout }) => {
+const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, onLogout, searchTerm, setSearchTerm }) => {
   return (
     <div className="flex flex-col h-screen bg-slate-50 overflow-hidden font-['Inter']">
       <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 md:px-12 z-20 no-print shrink-0">
         <div 
           className="flex items-center gap-3 cursor-pointer group"
-          onClick={() => setActiveTab('dashboard')}
+          onClick={() => {
+            setActiveTab('dashboard');
+            setSearchTerm('');
+          }}
         >
           <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-slate-200/50 group-hover:scale-105 transition-transform overflow-hidden border border-slate-100">
             <img 
@@ -35,6 +40,22 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, onLo
           <div>
             <h1 className="text-xl font-black text-slate-800 tracking-tight leading-none group-hover:text-blue-600 transition-colors font-serif">Smart School</h1>
             <p className="text-[10px] text-blue-600 font-bold uppercase tracking-[0.2em] mt-1">Asisten Digital Guru</p>
+          </div>
+        </div>
+
+        {/* Global Search Bar in Header */}
+        <div className="hidden lg:flex flex-1 max-w-md mx-12">
+          <div className="relative w-full">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </div>
+            <input 
+              type="text" 
+              placeholder={activeTab === 'library' ? "Cari buku, penulis..." : "Cari fitur..."}
+              className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none font-bold text-xs transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
         </div>
         

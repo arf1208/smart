@@ -4,9 +4,11 @@ import { Icons } from '../constants';
 
 interface DashboardProps {
   setActiveTab: (tab: string) => void;
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
+const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, searchTerm, setSearchTerm }) => {
   const menuFeatures = [
     { 
       id: 'modul', 
@@ -54,6 +56,11 @@ const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
     },
   ];
 
+  const filteredFeatures = menuFeatures.filter(feature => 
+    feature.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    feature.desc.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="px-6 md:px-12 py-12 space-y-12">
       <div className="text-center md:text-left space-y-4">
@@ -70,32 +77,48 @@ const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {menuFeatures.map((feature) => (
-          <div 
-            key={feature.id}
-            onClick={() => setActiveTab(feature.id)}
-            className="group relative bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-blue-100/50 hover:-translate-y-2 transition-all duration-500 cursor-pointer overflow-hidden"
-          >
-            <div className={`absolute -top-10 -right-10 w-32 h-32 ${feature.color} opacity-[0.03] rounded-full group-hover:scale-150 transition-transform duration-700`}></div>
-            <div className="relative z-10 space-y-6">
-              <div className={`${feature.color} w-16 h-16 rounded-[24px] flex items-center justify-center text-white shadow-xl ${feature.shadow} group-hover:scale-110 transition-transform duration-500`}>
-                {React.cloneElement(feature.icon as React.ReactElement<any>, { className: "w-8 h-8" })}
-              </div>
-              <div className="space-y-3">
-                <h3 className="text-2xl font-black text-slate-800 tracking-tight group-hover:text-blue-600 transition-colors">
-                  {feature.name}
-                </h3>
-                <p className="text-slate-500 font-medium leading-relaxed">
-                  {feature.desc}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-blue-600 font-black text-sm group-hover:gap-4 transition-all uppercase tracking-widest">
-                Mulai Sekarang
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+        {filteredFeatures.length > 0 ? (
+          filteredFeatures.map((feature) => (
+            <div 
+              key={feature.id}
+              onClick={() => setActiveTab(feature.id)}
+              className="group relative bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-blue-100/50 hover:-translate-y-2 transition-all duration-500 cursor-pointer overflow-hidden"
+            >
+              <div className={`absolute -top-10 -right-10 w-32 h-32 ${feature.color} opacity-[0.03] rounded-full group-hover:scale-150 transition-transform duration-700`}></div>
+              <div className="relative z-10 space-y-6">
+                <div className={`${feature.color} w-16 h-16 rounded-[24px] flex items-center justify-center text-white shadow-xl ${feature.shadow} group-hover:scale-110 transition-transform duration-500`}>
+                  {React.cloneElement(feature.icon as React.ReactElement<any>, { className: "w-8 h-8" })}
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-black text-slate-800 tracking-tight group-hover:text-blue-600 transition-colors">
+                    {feature.name}
+                  </h3>
+                  <p className="text-slate-500 font-medium leading-relaxed">
+                    {feature.desc}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-blue-600 font-black text-sm group-hover:gap-4 transition-all uppercase tracking-widest">
+                  Mulai Sekarang
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                </div>
               </div>
             </div>
+          ))
+        ) : (
+          <div className="col-span-full py-20 text-center bg-white border border-slate-100 rounded-[40px] shadow-sm">
+            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </div>
+            <h3 className="text-xl font-black text-slate-800 tracking-tight">Fitur Tidak Ditemukan</h3>
+            <p className="text-slate-400 font-bold mt-2 uppercase tracking-widest text-[10px]">Coba cari dengan kata kunci lain.</p>
+            <button 
+              onClick={() => setSearchTerm('')}
+              className="mt-8 px-8 py-3 bg-blue-600 text-white font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-blue-700 transition-all"
+            >
+              Reset Pencarian
+            </button>
           </div>
-        ))}
+        )}
 
         <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 rounded-[32px] text-white flex flex-col justify-between shadow-2xl shadow-blue-200">
           <div>

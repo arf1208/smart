@@ -11,7 +11,8 @@ async function startServer() {
   app.use(express.json());
 
   // API Login - Mengecek ke users.json
-  app.post("/api/login", (req, res) => {
+  // Menambahkan route /login.php agar sinkron dengan LoginPage.tsx di preview
+  app.post(["/api/login", "/login.php"], (req, res) => {
     const { email, password } = req.body;
     
     try {
