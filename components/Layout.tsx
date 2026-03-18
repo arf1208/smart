@@ -1,7 +1,8 @@
 
-import React from 'react';
-import { School } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { School, Settings, X, Key, Check } from 'lucide-react';
 import { APP_LOGO_URL } from '../constants';
+import { setDynamicApiKey } from '../services/geminiService';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,6 +14,28 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, onLogout, searchTerm, setSearchTerm }) => {
+  const [showSettings, setShowSettings] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    const savedKey = localStorage.getItem('user_gemini_api_key');
+    if (savedKey) {
+      setApiKey(savedKey);
+      setDynamicApiKey(savedKey);
+    }
+  }, []);
+
+  const handleSaveKey = () => {
+    localStorage.setItem('user_gemini_api_key', apiKey);
+    setDynamicApiKey(apiKey);
+    setIsSaved(true);
+    setTimeout(() => {
+      setIsSaved(false);
+      setShowSettings(false);
+    }, 1500);
+  };
+
   return (
     <div className="flex flex-col h-screen bg-slate-50 overflow-hidden font-['Inter']">
       <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 md:px-12 z-20 no-print shrink-0">
@@ -59,7 +82,15 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, onLo
           </div>
         </div>
         
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 md:gap-6">
+          <button 
+            onClick={() => setShowSettings(true)}
+            className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all border border-transparent hover:border-blue-100"
+            title="Pengaturan API Key"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
+          
           <button 
             onClick={() => setActiveTab('tutorial')}
             className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
@@ -82,6 +113,72 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, onLo
           </div>
         </div>
       </header>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-[32px] w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden">
+            <div className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                    <Key className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <h3 className="text-xl font-black text-slate-800 tracking-tight">Pengaturan API</h3>
+                </div>
+                <button onClick={() => setShowSettings(false)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <p className="text-sm text-slate-500 font-medium mb-6 leading-relaxed">
+                Jika Anda menggunakan StackBlitz atau lingkungan tanpa menu Secrets, masukkan API Key Gemini Anda di sini. Kunci akan disimpan di browser Anda.
+              </p>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gemini API Key</label>
+                  <div className="relative">
+                    <input 
+                      type="password"
+                      placeholder="AIzaSy..."
+                      className="w-full pl-4 pr-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-blue-600 outline-none font-bold text-sm transition-all"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  onClick={handleSaveKey}
+                  disabled={!apiKey}
+                  className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                    isSaved ? 'bg-emerald-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-100'
+                  }`}
+                >
+                  {isSaved ? (
+                    <>
+                      <Check className="w-5 h-5" />
+                      Tersimpan
+                    </>
+                  ) : (
+                    'Simpan Pengaturan'
+                  )}
+                </button>
+                
+                <a 
+                  href="https://aistudio.google.com/app/apikey" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block text-center text-xs text-blue-600 font-bold hover:underline mt-4"
+                >
+                  Dapatkan API Key Gratis di Sini
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="flex-1 flex flex-col overflow-hidden relative">
         <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#fcfdfe]">
