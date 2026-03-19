@@ -21,16 +21,24 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       return;
     }
     setLoading(true);
+    console.log(`Sending login request for: ${email}`);
     
     try {
       // Menggunakan login.php agar kompatibel saat di-deploy ke hosting PHP
-      const response = await fetch('login.php', {
+      const response = await fetch('/login.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
       
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Login failed with status ${response.status}: ${errorText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log('Login response data:', data);
       
       if (data.success) {
         showToast(`Selamat datang, ${data.user.name}!`, 'success');
@@ -39,6 +47,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         showToast(data.message, 'error');
       }
     } catch (error) {
+      console.error('Login error:', error);
       showToast('Gagal terhubung ke server.', 'error');
     } finally {
       setLoading(false);

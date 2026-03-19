@@ -27,21 +27,11 @@ const handleError = (error: any) => {
   return `Gagal generate konten: ${message || "Terjadi kesalahan sistem."}`;
 };
 
-let dynamicApiKey: string | null = null;
-
-export const setDynamicApiKey = (key: string) => {
-  dynamicApiKey = key;
-};
-
 const getApiKey = () => {
-  // 1. Cek kunci yang diinput manual di UI (paling prioritas)
-  if (dynamicApiKey) return dynamicApiKey;
-
-  // 2. Cek MY_API_KEY atau GEMINI_API_KEY dari system
+  // Cek MY_API_KEY (kunci custom user) dulu, kalau tidak ada pakai GEMINI_API_KEY (sistem)
   const key = process.env.MY_API_KEY || process.env.GEMINI_API_KEY;
-  
   if (!key) {
-    throw new Error("API Key tidak ditemukan. Silakan masukkan API Key di menu Pengaturan (ikon gerigi) di pojok kanan atas.");
+    throw new Error("API Key tidak ditemukan. Silakan tambahkan 'MY_API_KEY' di menu Secrets.");
   }
   return key;
 };

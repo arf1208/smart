@@ -10,16 +10,23 @@ async function startServer() {
 
   app.use(express.json());
 
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", message: "Server is running" });
+  });
+
   // API Login - Mengecek ke users.json
   // Menambahkan route /login.php agar sinkron dengan LoginPage.tsx di preview
   app.post(["/api/login", "/login.php"], (req, res) => {
     const { email, password } = req.body;
+    console.log(`Login attempt: ${email} / ${password}`);
     
     try {
       const usersData = fs.readFileSync(path.join(process.cwd(), "users.json"), "utf-8");
       const users = JSON.parse(usersData);
       
-      const user = users.find((u: any) => u.email === email && u.password === password);
+      const user = users.find((u: any) => 
+        (u.email === email || u.username === email) && u.password === password
+      );
       
       if (user) {
         res.json({ success: true, user: { name: user.name, email: user.email } });

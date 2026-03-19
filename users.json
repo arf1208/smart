@@ -1,11 +1,19 @@
 [
   {
     "email": "admin@smartschool.id",
+    "username": "admin",
     "password": "password123",
     "name": "Admin Smart School"
   },
   {
+    "email": "admin",
+    "username": "admin",
+    "password": "admin",
+    "name": "Admin (Shortcut)"
+  },
+  {
     "email": "guru@sekolah.com",
+    "username": "guru",
     "password": "guru2026",
     "name": "Guru Inovatif"
   }
