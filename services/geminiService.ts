@@ -28,10 +28,14 @@ const handleError = (error: any) => {
 };
 
 const getApiKey = () => {
-  // Cek MY_API_KEY (kunci custom user) dulu, kalau tidak ada pakai GEMINI_API_KEY (sistem)
-  const key = process.env.MY_API_KEY || process.env.GEMINI_API_KEY;
+  // Cek berbagai kemungkinan lokasi API Key (Vite env, process.env, atau fallback)
+  const key = 
+    (typeof process !== 'undefined' && (process.env.MY_API_KEY || process.env.GEMINI_API_KEY)) ||
+    (import.meta as any).env?.VITE_MY_API_KEY || 
+    (import.meta as any).env?.VITE_GEMINI_API_KEY;
+
   if (!key) {
-    throw new Error("API Key tidak ditemukan. Silakan tambahkan 'MY_API_KEY' di menu Secrets.");
+    throw new Error("API Key tidak ditemukan. Pastikan file '.env' sudah ada atau tambahkan di menu Secrets.");
   }
   return key;
 };
