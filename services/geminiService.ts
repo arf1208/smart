@@ -32,19 +32,8 @@ const handleError = (error: any) => {
 };
 
 const getApiKey = () => {
-  // API Key yang Anda berikan (Hardcoded sebagai fallback tercepat untuk klien)
-  const PROVIDED_KEY = "AIzaSyCbpajqNXTXWOi3NvlMmULDzcqpvqUUndU";
-  
-  const key = 
-    (typeof process !== 'undefined' && (process.env.MY_API_KEY || process.env.GEMINI_API_KEY)) ||
-    (import.meta as any).env?.VITE_MY_API_KEY || 
-    (import.meta as any).env?.VITE_GEMINI_API_KEY ||
-    PROVIDED_KEY;
-
-  if (!key) {
-    throw new Error("API Key tidak ditemukan. Pastikan file '.env' sudah ada atau tambahkan di menu Secrets.");
-  }
-  return key;
+  // API Key langsung di dalam kode sesuai permintaan
+  return "AIzaSyCbpajqNXTXWOi3NvlMmULDzcqpvqUUndU";
 };
 
 export const generateModulAjar = async (params: {
