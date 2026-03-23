@@ -1,17 +1,14 @@
--- 1. Buat Database di phpMyAdmin (misal: smart_school)
--- 2. Import file ini
+-- Database untuk Smart School
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL
+);
 
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- Contoh Akun Default (Password: password123)
-INSERT INTO `users` (`name`, `email`, `password`) VALUES
-('Admin Smart School', 'admin@smartschool.id', 'password123'),
-('Guru Inovatif', 'guru@sekolah.com', 'guru2026');
+INSERT INTO users (email, username, password, name) VALUES 
+('admin@smartschool.id', 'admin', 'password123', 'Admin Smart School'),
+('admin', 'admin', 'admin', 'Admin (Shortcut)'),
+('adminsmartschool@', 'adminsmartschool@', 'adminsmartschool@', 'Pemilik Smart School'),
+('guru@sekolah.com', 'guru', 'guru2026', 'Guru Inovatif');

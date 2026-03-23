@@ -12,6 +12,9 @@ Ketentuan Penulisan:
 5. Untuk Mata Pelajaran Kejuruan (SMK): Pastikan konten teknis akurat, menggunakan istilah industri yang tepat, dan mengacu pada standar kompetensi kerja yang relevan (SKKNI atau standar industri).
 6. PENTING: Jangan mengulang informasi identitas (nama sekolah, kelas, tahun ajaran, kurikulum) di dalam kolom materi esensial. Isikan hanya topik materinya saja (maksimal 3-5 kata).`;
 
+// Solusi Permanen: Menggunakan Proxy PHP agar API Key aman di server (Rumahweb)
+const PROXY_URL = "/php-backend/gemini_proxy.php";
+
 const handleError = (error: any) => {
   console.error("API Error:", error);
   const message = error?.message || "";
@@ -31,11 +34,6 @@ const handleError = (error: any) => {
   return `Gagal generate konten: ${message || "Terjadi kesalahan sistem."}`;
 };
 
-const getApiKey = () => {
-  // API Key langsung di dalam kode sesuai permintaan
-  return "AIzaSyCbpajqNXTXWOi3NvlMmULDzcqpvqUUndU";
-};
-
 export const generateModulAjar = async (params: {
   teacherName: string;
   level: string;
@@ -45,7 +43,6 @@ export const generateModulAjar = async (params: {
   duration: string;
 }) => {
   try {
-    const ai = new GoogleGenAI({ apiKey: getApiKey() });
     const prompt = `Buatkan MODUL AJAR KURIKULUM MERDEKA yang sangat lengkap, sistematis, dan mendalam.
 - Guru: ${params.teacherName}
 - Mapel: ${params.subject}
@@ -88,15 +85,16 @@ III. LAMPIRAN
 
 Gunakan format yang rapi, profesional, dan mudah dibaca oleh guru.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-      config: { 
-        systemInstruction: SYSTEM_INSTRUCTION, 
-        temperature: 0.7
-      }
+    const response = await fetch(PROXY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
     });
-    return response.text;
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    
+    return data.candidates[0].content.parts[0].text;
   } catch (err) {
     throw new Error(handleError(err));
   }
@@ -113,7 +111,6 @@ export const generateQuestions = async (params: {
   difficulty: 'Mudah' | 'Sedang' | 'Sulit';
 }) => {
   try {
-    const ai = new GoogleGenAI({ apiKey: getApiKey() });
     const prompt = `Hasilkan TEPAT ${params.count} butir soal ${params.type} untuk mata pelajaran ${params.subject} Kelas ${params.kelas}.
 Tingkat Kesulitan: ${params.difficulty} (Berbasis HOTS).
 
@@ -130,50 +127,16 @@ Ketentuan Khusus:
 - Jika jumlah soal banyak (${params.count} soal), pastikan setiap soal tetap unik dan berkualitas.
 - Pastikan JSON tertutup dengan sempurna (valid JSON).`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-        responseMimeType: "application/json",
-        temperature: 0.4, 
-        responseSchema: {
-          type: Type.OBJECT,
-          required: ["kisiKisi", "soal"],
-          properties: {
-            kisiKisi: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                required: ["materi", "indikator", "level"],
-                properties: {
-                  materi: { type: Type.STRING },
-                  indikator: { type: Type.STRING },
-                  level: { type: Type.STRING }
-                }
-              }
-            },
-            soal: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                required: ["nomor", "pertanyaan", "jawabanBenar", "penjelasan"],
-                properties: {
-                  nomor: { type: Type.NUMBER },
-                  stimulus: { type: Type.STRING },
-                  pertanyaan: { type: Type.STRING },
-                  opsi: { type: Type.ARRAY, items: { type: Type.STRING } },
-                  jawabanBenar: { type: Type.STRING },
-                  penjelasan: { type: Type.STRING }
-                }
-              }
-            }
-          }
-        }
-      }
+    const response = await fetch(PROXY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
     });
 
-    const text = response.text?.trim();
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+
+    const text = data.candidates[0].content.parts[0].text?.trim();
     if (!text) throw new Error("Model returned empty response");
     
     // Handle potential markdown code blocks
@@ -199,17 +162,19 @@ export const generateLKPD = async (params: {
   topic: string;
 }) => {
   try {
-    const ai = new GoogleGenAI({ apiKey: getApiKey() });
     const prompt = `Buatkan LKPD (Lembar Kerja Peserta Didik) interaktif dan eksploratif untuk ${params.subject}, topik: ${params.topic}. 
 Sertakan langkah kerja praktikum/diskusi yang jelas, tabel pengamatan, dan pertanyaan analisis.`;
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-      config: { 
-        systemInstruction: SYSTEM_INSTRUCTION
-      }
+    
+    const response = await fetch(PROXY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
     });
-    return response.text;
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    
+    return data.candidates[0].content.parts[0].text;
   } catch (err) {
     throw new Error(handleError(err));
   }
@@ -223,17 +188,19 @@ export const generateAdminDocs = async (params: {
   docType: 'ATP' | 'CP' | 'RPP';
 }) => {
   try {
-    const ai = new GoogleGenAI({ apiKey: getApiKey() });
     const prompt = `Buatkan dokumen ${params.docType} resmi Kurikulum Merdeka untuk mata pelajaran ${params.subject} Fase ${params.fase}. 
 Pastikan struktur tabel rapi dan substansi sesuai dengan standar Kemendikbudristek terbaru.`;
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-      config: { 
-        systemInstruction: SYSTEM_INSTRUCTION
-      }
+    
+    const response = await fetch(PROXY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
     });
-    return response.text;
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    
+    return data.candidates[0].content.parts[0].text;
   } catch (err) {
     throw new Error(handleError(err));
   }
