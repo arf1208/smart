@@ -12,25 +12,14 @@ Ketentuan Penulisan:
 5. Untuk Mata Pelajaran Kejuruan (SMK): Pastikan konten teknis akurat, menggunakan istilah industri yang tepat, dan mengacu pada standar kompetensi kerja yang relevan (SKKNI atau standar industri).
 6. PENTING: Jangan mengulang informasi identitas (nama sekolah, kelas, tahun ajaran, kurikulum) di dalam kolom materi esensial. Isikan hanya topik materinya saja (maksimal 3-5 kata).`;
 
-// Solusi Permanen: Menggunakan Proxy PHP agar API Key aman di server (Rumahweb)
+// Mode Pintar: Deteksi apakah sedang di Preview atau di Hosting asli
+const isPreview = window.location.hostname.includes('run.app') || window.location.hostname.includes('localhost');
 const PROXY_URL = "/php-backend/gemini_proxy.php";
+const FALLBACK_KEY = "AIzaSyBUjtjmbbwIp0ZNzmYmwa4WSp3I0IRY1KQ";
 
 const handleError = (error: any) => {
   console.error("API Error:", error);
   const message = error?.message || "";
-  
-  if (message.includes("leaked") || message.includes("API key was reported as leaked")) {
-    return "API Key Anda telah dinonaktifkan oleh Google karena terdeteksi bocor (leaked). Hal ini terjadi karena kunci tersebut tertulis di file publik (seperti .env.example di GitHub/StackBlitz). Silakan buat API Key BARU di Google AI Studio dan masukkan ke menu 'Secrets' (ikon gerigi) atau file .env lokal Anda. JANGAN tulis kunci di file .env.example.";
-  }
-  
-  if (message.includes("quota") || error?.status === 429) {
-    return "Kuota API terlampaui. Silakan coba beberapa saat lagi atau pastikan akun penagihan (billing) Anda aktif.";
-  }
-  
-  if (message.includes("Requested entity was not found")) {
-    return "Layanan tidak tersedia atau model tidak ditemukan. Pastikan konfigurasi API Key sudah benar.";
-  }
-
   return `Gagal generate konten: ${message || "Terjadi kesalahan sistem."}`;
 };
 
@@ -42,8 +31,7 @@ export const generateModulAjar = async (params: {
   topic: string;
   duration: string;
 }) => {
-  try {
-    const prompt = `Buatkan MODUL AJAR KURIKULUM MERDEKA yang sangat lengkap, sistematis, dan mendalam.
+  const prompt = `Buatkan MODUL AJAR KURIKULUM MERDEKA yang sangat lengkap, sistematis, dan mendalam.
 - Guru: ${params.teacherName}
 - Mapel: ${params.subject}
 - Materi: ${params.topic}
@@ -52,48 +40,27 @@ export const generateModulAjar = async (params: {
 - Durasi: ${params.duration}
 
 Struktur Modul WAJIB mencakup komponen berikut secara detail:
-
 I. INFORMASI UMUM
-1. Identitas Modul: Nama penyusun, institusi, tahun, jenjang, kelas, dan alokasi waktu.
-2. Kompetensi Awal: Pengetahuan/keterampilan yang perlu dimiliki siswa sebelum mempelajari topik ini.
-3. Profil Pelajar Pancasila: Sebutkan dimensi yang berkaitan (misal: Mandiri, Bernalar Kritis, Kreatif).
-4. Sarana dan Prasarana: Fasilitas dan bahan yang dibutuhkan.
-5. Target Peserta Didik: (Reguler/Tipikal, Kesulitan Belajar, atau Pencapaian Tinggi).
-6. Model Pembelajaran: Sebutkan model yang digunakan (misal: PBL, PJBL, Discovery Learning).
-
 II. KOMPONEN INTI
-1. Tujuan Pembelajaran: Harus spesifik dan terukur.
-2. Pemahaman Bermakna: Manfaat yang akan diperoleh siswa setelah proses pembelajaran.
-3. Pertanyaan Pemantik: Pertanyaan untuk menumbuhkan rasa ingin tahu siswa.
-4. Persiapan Pembelajaran: Langkah-langkah teknis sebelum mengajar.
-5. Kegiatan Pembelajaran:
-   - Pendahuluan (Apersepsi, Motivasi)
-   - Inti (Langkah-langkah sesuai model pembelajaran)
-   - Penutup (Refleksi, Kesimpulan, Tindak Lanjut)
-6. Asesmen:
-   - Asesmen sebelum pembelajaran (Diagnostik)
-   - Asesmen selama proses pembelajaran (Formatif)
-   - Asesmen pada akhir proses pembelajaran (Sumatif)
-7. Pengayaan dan Remedial: Strategi untuk siswa yang butuh tantangan lebih atau bantuan tambahan.
-8. Refleksi Peserta Didik dan Guru.
+III. LAMPIRAN`;
 
-III. LAMPIRAN
-1. Lembar Kerja Peserta Didik (LKPD): Ringkasan tugas/aktivitas siswa.
-2. Bahan Bacaan Guru & Peserta Didik: Ringkasan materi esensial.
-3. Glosarium: Istilah-istilah penting dan artinya.
-4. Daftar Pustaka.
-
-Gunakan format yang rapi, profesional, dan mudah dibaca oleh guru.`;
+  try {
+    if (isPreview) {
+      const ai = new GoogleGenAI({ apiKey: FALLBACK_KEY });
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: prompt,
+        config: { systemInstruction: SYSTEM_INSTRUCTION, temperature: 0.7 }
+      });
+      return response.text;
+    } 
 
     const response = await fetch(PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
-
     const data = await response.json();
-    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-    
     return data.candidates[0].content.parts[0].text;
   } catch (err) {
     throw new Error(handleError(err));
@@ -110,45 +77,33 @@ export const generateQuestions = async (params: {
   type: 'Pilihan Ganda' | 'Essay';
   difficulty: 'Mudah' | 'Sedang' | 'Sulit';
 }) => {
-  try {
-    const prompt = `Hasilkan TEPAT ${params.count} butir soal ${params.type} untuk mata pelajaran ${params.subject} Kelas ${params.kelas}.
+  const prompt = `Hasilkan TEPAT ${params.count} butir soal ${params.type} untuk mata pelajaran ${params.subject} Kelas ${params.kelas}.
 Tingkat Kesulitan: ${params.difficulty} (Berbasis HOTS).
+WAJIB menghasilkan JSON dengan struktur: { kisiKisi: [], soal: [] }`;
 
-WAJIB menghasilkan JSON dengan struktur yang valid dan lengkap. 
-PENTING: Anda HARUS menghasilkan ${params.count} soal. Jangan berhenti di tengah jalan. 
-
-Struktur JSON:
-1. kisiKisi: array objek { materi: string, indikator: string, level: string (L1/L2/L3) }. 
-   "materi" harus spesifik topik (misal: "Hukum Newton", "Sistem Pencernaan").
-2. soal: array objek { nomor: number, stimulus: string, pertanyaan: string, opsi: string[] (kosongkan jika Essay), jawabanBenar: string, penjelasan: string }.
-
-Ketentuan Khusus:
-- Stimulus harus mendalam dan kontekstual.
-- Jika jumlah soal banyak (${params.count} soal), pastikan setiap soal tetap unik dan berkualitas.
-- Pastikan JSON tertutup dengan sempurna (valid JSON).`;
+  try {
+    if (isPreview) {
+      const ai = new GoogleGenAI({ apiKey: FALLBACK_KEY });
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: prompt,
+        config: {
+          systemInstruction: SYSTEM_INSTRUCTION,
+          responseMimeType: "application/json",
+          temperature: 0.4
+        }
+      });
+      return JSON.parse(response.text);
+    }
 
     const response = await fetch(PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
-
     const data = await response.json();
-    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-
-    const text = data.candidates[0].content.parts[0].text?.trim();
-    if (!text) throw new Error("Model returned empty response");
-    
-    // Handle potential markdown code blocks
-    const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || text.match(/```\s*([\s\S]*?)\s*```/);
-    const jsonString = jsonMatch ? jsonMatch[1] : text;
-    
-    try {
-      return JSON.parse(jsonString);
-    } catch (parseError) {
-      console.error("JSON Parse Error:", parseError, "Raw Text:", text);
-      throw new Error("Gagal mengurai hasil generate. Silakan coba lagi.");
-    }
+    const text = data.candidates[0].content.parts[0].text;
+    return JSON.parse(text);
   } catch (err) {
     throw new Error(handleError(err));
   }
@@ -161,19 +116,24 @@ export const generateLKPD = async (params: {
   subject: string;
   topic: string;
 }) => {
+  const prompt = `Buatkan LKPD interaktif untuk ${params.subject}, topik: ${params.topic}.`;
   try {
-    const prompt = `Buatkan LKPD (Lembar Kerja Peserta Didik) interaktif dan eksploratif untuk ${params.subject}, topik: ${params.topic}. 
-Sertakan langkah kerja praktikum/diskusi yang jelas, tabel pengamatan, dan pertanyaan analisis.`;
-    
+    if (isPreview) {
+      const ai = new GoogleGenAI({ apiKey: FALLBACK_KEY });
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: prompt,
+        config: { systemInstruction: SYSTEM_INSTRUCTION }
+      });
+      return response.text;
+    }
+
     const response = await fetch(PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
-
     const data = await response.json();
-    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-    
     return data.candidates[0].content.parts[0].text;
   } catch (err) {
     throw new Error(handleError(err));
@@ -187,19 +147,24 @@ export const generateAdminDocs = async (params: {
   subject: string;
   docType: 'ATP' | 'CP' | 'RPP';
 }) => {
+  const prompt = `Buatkan dokumen ${params.docType} untuk ${params.subject} Fase ${params.fase}.`;
   try {
-    const prompt = `Buatkan dokumen ${params.docType} resmi Kurikulum Merdeka untuk mata pelajaran ${params.subject} Fase ${params.fase}. 
-Pastikan struktur tabel rapi dan substansi sesuai dengan standar Kemendikbudristek terbaru.`;
-    
+    if (isPreview) {
+      const ai = new GoogleGenAI({ apiKey: FALLBACK_KEY });
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: prompt,
+        config: { systemInstruction: SYSTEM_INSTRUCTION }
+      });
+      return response.text;
+    }
+
     const response = await fetch(PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
-
     const data = await response.json();
-    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-    
     return data.candidates[0].content.parts[0].text;
   } catch (err) {
     throw new Error(handleError(err));
