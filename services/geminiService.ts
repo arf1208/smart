@@ -52,7 +52,7 @@ III. LAMPIRAN`;
         contents: prompt,
         config: { systemInstruction: SYSTEM_INSTRUCTION, temperature: 0.7 }
       });
-      return response.text;
+      return response.text || "";
     } 
 
     const response = await fetch(PROXY_URL, {
@@ -93,7 +93,7 @@ WAJIB menghasilkan JSON dengan struktur: { kisiKisi: [], soal: [] }`;
           temperature: 0.4
         }
       });
-      return JSON.parse(response.text);
+      return JSON.parse(response.text || "{}");
     }
 
     const response = await fetch(PROXY_URL, {
@@ -102,7 +102,7 @@ WAJIB menghasilkan JSON dengan struktur: { kisiKisi: [], soal: [] }`;
       body: JSON.stringify({ prompt }),
     });
     const data = await response.json();
-    const text = data.candidates[0].content.parts[0].text;
+    const text = data.candidates[0].content.parts[0].text || "{}";
     return JSON.parse(text);
   } catch (err) {
     throw new Error(handleError(err));
@@ -125,7 +125,7 @@ export const generateLKPD = async (params: {
         contents: prompt,
         config: { systemInstruction: SYSTEM_INSTRUCTION }
       });
-      return response.text;
+      return response.text || "";
     }
 
     const response = await fetch(PROXY_URL, {
@@ -156,7 +156,7 @@ export const generateAdminDocs = async (params: {
         contents: prompt,
         config: { systemInstruction: SYSTEM_INSTRUCTION }
       });
-      return response.text;
+      return response.text || "";
     }
 
     const response = await fetch(PROXY_URL, {
