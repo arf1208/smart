@@ -16,6 +16,10 @@ const handleError = (error: any) => {
   console.error("API Error:", error);
   const message = error?.message || "";
   
+  if (message.includes("leaked") || message.includes("API key was reported as leaked")) {
+    return "API Key Anda telah dinonaktifkan oleh Google karena terdeteksi bocor (leaked). Hal ini terjadi karena kunci tersebut tertulis di file publik (seperti .env.example di GitHub/StackBlitz). Silakan buat API Key BARU di Google AI Studio dan masukkan ke menu 'Secrets' (ikon gerigi) atau file .env lokal Anda. JANGAN tulis kunci di file .env.example.";
+  }
+  
   if (message.includes("quota") || error?.status === 429) {
     return "Kuota API terlampaui. Silakan coba beberapa saat lagi atau pastikan akun penagihan (billing) Anda aktif.";
   }
@@ -28,11 +32,14 @@ const handleError = (error: any) => {
 };
 
 const getApiKey = () => {
-  // Cek berbagai kemungkinan lokasi API Key (Vite env, process.env, atau fallback)
+  // API Key yang Anda berikan (Hardcoded sebagai fallback tercepat untuk klien)
+  const PROVIDED_KEY = "AIzaSyCbpajqNXTXWOi3NvlMmULDzcqpvqUUndU";
+  
   const key = 
     (typeof process !== 'undefined' && (process.env.MY_API_KEY || process.env.GEMINI_API_KEY)) ||
     (import.meta as any).env?.VITE_MY_API_KEY || 
-    (import.meta as any).env?.VITE_GEMINI_API_KEY;
+    (import.meta as any).env?.VITE_GEMINI_API_KEY ||
+    PROVIDED_KEY;
 
   if (!key) {
     throw new Error("API Key tidak ditemukan. Pastikan file '.env' sudah ada atau tambahkan di menu Secrets.");
