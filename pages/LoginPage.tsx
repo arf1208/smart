@@ -21,25 +21,48 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       return;
     }
     setLoading(true);
-    console.log(`Sending login request for: ${email}`);
     
+    // Deteksi apakah sedang di Preview atau Hosting
+    const isPreview = window.location.hostname.includes('run.app') || 
+                      window.location.hostname.includes('localhost') ||
+                      window.location.hostname.includes('webcontainer.io');
+
     try {
-      // Menggunakan login.php agar kompatibel saat di-deploy ke hosting PHP
-      const response = await fetch('/login.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      let data;
+      console.log(`Login attempt in ${isPreview ? 'PREVIEW' : 'HOSTING'} mode`);
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`Login failed with status ${response.status}: ${errorText}`);
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (isPreview) {
+        // MODE PREVIEW: Baca langsung dari users.json (karena server dev tidak bisa jalankan PHP)
+        const response = await fetch('/users.json');
+        if (!response.ok) {
+          throw new Error(`Gagal memuat users.json (Status: ${response.status})`);
+        }
+        const users = await response.json();
+        console.log('Available users in preview:', users);
+        
+        const user = users.find((u: any) => 
+          (u.email === email || u.username === email) && u.password === password
+        );
+        
+        if (user) {
+          data = { success: true, user: { name: user.name, email: user.email } };
+        } else {
+          data = { success: false, message: 'Email atau Password salah.' };
+        }
+      } else {
+        // MODE HOSTING: Gunakan login.php (Aman & Server-side)
+        const response = await fetch('/login.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        data = await response.json();
       }
 
-      const data = await response.json();
-      console.log('Login response data:', data);
-      
       if (data.success) {
         showToast(`Selamat datang, ${data.user.name}!`, 'success');
         onLogin();

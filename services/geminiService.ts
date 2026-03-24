@@ -13,7 +13,9 @@ Ketentuan Penulisan:
 6. PENTING: Jangan mengulang informasi identitas (nama sekolah, kelas, tahun ajaran, kurikulum) di dalam kolom materi esensial. Isikan hanya topik materinya saja (maksimal 3-5 kata).`;
 
 // Mode Pintar: Deteksi apakah sedang di Preview atau di Hosting asli
-const isPreview = window.location.hostname.includes('run.app') || window.location.hostname.includes('localhost');
+const isPreview = window.location.hostname.includes('run.app') || 
+                  window.location.hostname.includes('localhost') ||
+                  window.location.hostname.includes('webcontainer.io');
 const PROXY_URL = "/gemini_proxy.php";
 const FALLBACK_KEY = "AIzaSyBUjtjmbbwIp0ZNzmYmwa4WSp3I0IRY1KQ";
 

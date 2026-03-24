@@ -21,7 +21,7 @@ async function startServer() {
     console.log(`Login attempt: ${email} / ${password}`);
     
     try {
-      const usersData = fs.readFileSync(path.join(process.cwd(), "users.json"), "utf-8");
+      const usersData = fs.readFileSync(path.join(process.cwd(), "public", "users.json"), "utf-8");
       const users = JSON.parse(usersData);
       
       const user = users.find((u: any) => 
