@@ -43,8 +43,11 @@ const QuestionGenerator: React.FC = () => {
 
     try {
       const data = await generateQuestions(formData);
+      console.log("AI Parsed Data:", data);
+      
       if (!data || !data.soal || data.soal.length === 0) {
-        throw new Error("Hasil generate kosong. Silakan coba lagi.");
+        console.warn("Empty data received:", data);
+        throw new Error("Hasil generate kosong. Silakan coba lagi atau gunakan kata kunci yang lebih jelas (misal: 'Matematika' bukan 'mtk').");
       }
       setResult(data);
       showToast('Bank Soal berhasil dibuat!', 'success');

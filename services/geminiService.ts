@@ -36,7 +36,7 @@ const callAI = async (prompt: string, isJson: boolean = false) => {
       }
 
       const genAI = new GoogleGenAI({ apiKey });
-      const response = await genAI.models.generateContent({
+      const result = await genAI.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: prompt,
         config: { 
@@ -45,7 +45,26 @@ const callAI = async (prompt: string, isJson: boolean = false) => {
           temperature: isJson ? 0.4 : 0.7 
         }
       });
-      return isJson ? JSON.parse(response.text || "{}") : (response.text || "");
+
+      const text = result.text;
+      console.log("AI Raw Response:", text);
+
+      if (!text) {
+        throw new Error("AI tidak memberikan respon (mungkin terblokir filter keamanan).");
+      }
+
+      if (isJson) {
+        try {
+          // Bersihkan jika AI memberikan markdown code blocks
+          const cleanJson = text.replace(/```json\n?|```/g, "").trim();
+          return JSON.parse(cleanJson);
+        } catch (e) {
+          console.error("JSON Parse Error:", e, "Raw text:", text);
+          throw new Error("Format data dari AI tidak valid. Silakan coba lagi.");
+        }
+      }
+      
+      return text;
     } else {
       // MODE HOSTING: Gunakan PHP Proxy
       const response = await fetch(PROXY_URL, {
@@ -103,7 +122,22 @@ export const generateQuestions = async (params: {
 }) => {
   const prompt = `Hasilkan TEPAT ${params.count} butir soal ${params.type} untuk mata pelajaran ${params.subject} Kelas ${params.kelas}.
 Tingkat Kesulitan: ${params.difficulty} (Berbasis HOTS).
-WAJIB menghasilkan JSON dengan struktur: { kisiKisi: [], soal: [] }`;
+
+WAJIB menghasilkan JSON dengan struktur berikut dan JANGAN biarkan array 'soal' kosong:
+{
+  "kisiKisi": [
+    { "no": 1, "materi": "...", "indikator": "..." }
+  ],
+  "soal": [
+    {
+      "nomor": 1,
+      "pertanyaan": "...",
+      "pilihan": { "A": "...", "B": "...", "C": "...", "D": "...", "E": "..." },
+      "jawabanBenar": "A",
+      "penjelasan": "..."
+    }
+  ]
+}`;
 
   try {
     return await callAI(prompt, true);
