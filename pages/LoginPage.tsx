@@ -22,52 +22,33 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     }
     setLoading(true);
     
-    // Deteksi apakah sedang di Preview atau Hosting
-    const isPreview = window.location.hostname.includes('run.app') || 
-                      window.location.hostname.includes('localhost') ||
-                      window.location.hostname.includes('webcontainer.io');
-
     try {
       let data;
-      console.log(`Login attempt in ${isPreview ? 'PREVIEW' : 'HOSTING'} mode`);
+      console.log(`Login attempt: Fetching from users.json`);
       
-      if (isPreview) {
-        // MODE PREVIEW: Baca langsung dari users.json (karena server dev tidak bisa jalankan PHP)
-        const response = await fetch('/users.json');
-        if (!response.ok) {
-          throw new Error(`Gagal memuat users.json (Status: ${response.status})`);
-        }
-        const users = await response.json();
-        console.log('Available users in preview:', users);
-        
-        const user = users.find((u: any) => 
-          (u.email === email || u.username === email) && u.password === password
-        );
-        
-        if (user) {
-          data = { success: true, user: { name: user.name, email: user.email } };
-        } else {
-          data = { success: false, message: 'Email atau Password salah.' };
-        }
+      // Membaca langsung dari users.json (karena file PHP sudah dihapus)
+      const response = await fetch('/users.json');
+      if (!response.ok) {
+        throw new Error(`Gagal memuat users.json (Status: ${response.status})`);
+      }
+      const users = await response.json();
+      console.log('Available users:', users);
+      
+      const user = users.find((u: any) => 
+        (u.email === email || u.username === email) && u.password === password
+      );
+      
+      if (user) {
+        data = { success: true, user: { name: user.name, email: user.email } };
       } else {
-        // MODE HOSTING: Gunakan login.php (Aman & Server-side)
-        const response = await fetch('/login.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        data = await response.json();
+        data = { success: false, message: 'Email atau Password salah.' };
       }
 
-      if (data.success) {
+      if (data.success && data.user) {
         showToast(`Selamat datang, ${data.user.name}!`, 'success');
         onLogin();
       } else {
-        showToast(data.message, 'error');
+        showToast(data.message || 'Email atau Password salah.', 'error');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -188,7 +169,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
               className="inline-flex flex-col items-center w-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 py-4 px-6 rounded-2xl transition-all group"
             >
               <span className="text-xs font-bold uppercase tracking-wider opacity-70">Aktivasi Akun Selamanya</span>
-              <span className="text-lg font-black mt-1 group-hover:scale-105 transition-transform">Beli Akses — Rp 49.000</span>
+              <span className="text-lg font-black mt-1 group-hover:scale-105 transition-transform">Beli Akses — Rp 49.999</span>
             </a>
           </div>
         </div>

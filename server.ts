@@ -15,7 +15,7 @@ async function startServer() {
   });
 
   // API Login - Mengecek ke users.json
-  app.post(["/api/login", "/login.php"], (req, res) => {
+  app.post("/api/login", (req, res) => {
     const { email, password } = req.body;
     console.log(`Login attempt: ${email} / ${password}`);
     
@@ -34,31 +34,6 @@ async function startServer() {
       }
     } catch (error) {
       res.status(500).json({ success: false, message: "Terjadi kesalahan pada server." });
-    }
-  });
-
-  // Proxy Gemini untuk Preview (StackBlitz)
-  app.post("/gemini_proxy.php", async (req, res) => {
-    const { prompt } = req.body;
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
-      return res.status(500).json({ error: "GEMINI_API_KEY tidak ditemukan di environment preview." });
-    }
-
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
-        })
-      });
-      const data = await response.json();
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ error: "Gagal menghubungi API Gemini dari server preview." });
     }
   });
 

@@ -11,72 +11,51 @@ Ketentuan Penulisan:
 5. Untuk Mata Pelajaran Kejuruan (SMK): Pastikan konten teknis akurat, menggunakan istilah industri yang tepat, dan mengacu pada standar kompetensi kerja yang relevan (SKKNI atau standar industri).
 6. PENTING: Jangan mengulang informasi identitas (nama sekolah, kelas, tahun ajaran, kurikulum) di dalam kolom materi esensial. Isikan hanya topik materinya saja (maksimal 3-5 kata).`;
 
-// Mode Pintar: Deteksi apakah sedang di Preview atau di Hosting asli
-const isPreview = window.location.hostname.includes('run.app') || 
-                  window.location.hostname.includes('localhost') ||
-                  window.location.hostname.includes('webcontainer.io');
-
-const PROXY_URL = "/gemini_proxy.php";
-
 const handleError = (error: any) => {
   console.error("API Error:", error);
   const message = error?.message || "";
   return `Gagal generate konten: ${message || "Terjadi kesalahan sistem."}`;
 };
 
-// Fungsi pembantu untuk memanggil AI (Preview vs Hosting)
+// Mode Preview: Gunakan SDK resmi dengan Key dari Environment (Otomatis & Aman)
 const callAI = async (prompt: string, isJson: boolean = false) => {
   try {
-    if (isPreview) {
-      // MODE PREVIEW: Gunakan SDK resmi dengan Key dari Environment (Otomatis & Aman)
-      const apiKey = process.env.GEMINI_API_KEY;
-      
-      if (!apiKey || apiKey === "undefined") {
-        return "Gagal: Gemini API Key tidak ditemukan di environment. Pastikan Anda sudah menyetelnya di pengaturan.";
-      }
-
-      const genAI = new GoogleGenAI({ apiKey });
-      const result = await genAI.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: prompt,
-        config: { 
-          systemInstruction: SYSTEM_INSTRUCTION,
-          responseMimeType: isJson ? "application/json" : "text/plain",
-          temperature: isJson ? 0.4 : 0.7 
-        }
-      });
-
-      const text = result.text;
-      console.log("AI Raw Response:", text);
-
-      if (!text) {
-        throw new Error("AI tidak memberikan respon (mungkin terblokir filter keamanan).");
-      }
-
-      if (isJson) {
-        try {
-          // Bersihkan jika AI memberikan markdown code blocks
-          const cleanJson = text.replace(/```json\n?|```/g, "").trim();
-          return JSON.parse(cleanJson);
-        } catch (e) {
-          console.error("JSON Parse Error:", e, "Raw text:", text);
-          throw new Error("Format data dari AI tidak valid. Silakan coba lagi.");
-        }
-      }
-      
-      return text;
-    } else {
-      // MODE HOSTING: Gunakan PHP Proxy
-      const response = await fetch(PROXY_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
-      });
-      const data = await response.json();
-      if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || (isJson ? "{}" : "");
-      return isJson ? JSON.parse(text) : text;
+    const apiKey = process.env.GEMINI_API_KEY;
+    
+    if (!apiKey || apiKey === "undefined") {
+      return "Gagal: Gemini API Key tidak ditemukan di environment. Pastikan Anda sudah menyetelnya di pengaturan.";
     }
+
+    const genAI = new GoogleGenAI({ apiKey });
+    const result = await genAI.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
+      config: { 
+        systemInstruction: SYSTEM_INSTRUCTION,
+        responseMimeType: isJson ? "application/json" : "text/plain",
+        temperature: isJson ? 0.4 : 0.7 
+      }
+    });
+
+    const text = result.text;
+    console.log("AI Raw Response:", text);
+
+    if (!text) {
+      throw new Error("AI tidak memberikan respon (mungkin terblokir filter keamanan).");
+    }
+
+    if (isJson) {
+      try {
+        // Bersihkan jika AI memberikan markdown code blocks
+        const cleanJson = text.replace(/```json\n?|```/g, "").trim();
+        return JSON.parse(cleanJson);
+      } catch (e) {
+        console.error("JSON Parse Error:", e, "Raw text:", text);
+        throw new Error("Format data dari AI tidak valid. Silakan coba lagi.");
+      }
+    }
+    
+    return text;
   } catch (err) {
     throw err;
   }
