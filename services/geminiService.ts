@@ -29,7 +29,13 @@ const callAI = async (prompt: string, isJson: boolean = false) => {
   try {
     if (isPreview) {
       // MODE PREVIEW: Gunakan SDK resmi dengan Key dari Environment (Otomatis & Aman)
-      const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const apiKey = process.env.GEMINI_API_KEY;
+      
+      if (!apiKey || apiKey === "undefined") {
+        return "Gagal: Gemini API Key tidak ditemukan di environment. Pastikan Anda sudah menyetelnya di pengaturan.";
+      }
+
+      const genAI = new GoogleGenAI({ apiKey });
       const response = await genAI.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: prompt,
