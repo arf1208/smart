@@ -1,29 +1,15 @@
 <?php
 /**
- * Gemini AI Proxy for Rumahweb Hosting
- * Menjaga API Key tetap aman di sisi server.
+ * api-proxy.php - Jembatan Aman ke Gemini AI
  */
+require_once 'config.php';
+protect_page(); // Hanya user login yang bisa panggil AI
 
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit(0);
-}
-
-// AMBIL API KEY DARI SINI (Ganti dengan Key Anda)
-$API_KEY = getenv('GEMINI_API_KEY') ?: 'YOUR_GEMINI_API_KEY_HERE';
-
-if ($API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
-    echo json_encode(['error' => 'API Key belum disetel di server.']);
-    exit;
-}
 
 $input = json_decode(file_get_contents('php://input'), true);
 $prompt = $input['prompt'] ?? '';
-$systemInstruction = $input['systemInstruction'] ?? '';
+$instruction = $input['instruction'] ?? '';
 $isJson = $input['isJson'] ?? false;
 
 if (empty($prompt)) {
@@ -34,12 +20,8 @@ if (empty($prompt)) {
 $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $API_KEY;
 
 $data = [
-    "contents" => [
-        ["parts" => [["text" => $prompt]]]
-    ],
-    "systemInstruction" => [
-        "parts" => [["text" => $systemInstruction]]
-    ],
+    "contents" => [["parts" => [["text" => $prompt]]]],
+    "systemInstruction" => ["parts" => [["text" => $instruction]]],
     "generationConfig" => [
         "temperature" => $isJson ? 0.4 : 0.7,
         "responseMimeType" => $isJson ? "application/json" : "text/plain"
@@ -51,7 +33,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Penting untuk beberapa shared hosting
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -62,6 +44,5 @@ if (curl_errno($ch)) {
     http_response_code($httpCode);
     echo $response;
 }
-
 curl_close($ch);
 ?>
