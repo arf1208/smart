@@ -1,5 +1,4 @@
-
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 
 const SYSTEM_INSTRUCTION = `Anda adalah AI Pakar Evaluasi Pendidikan Indonesia dengan spesialisasi Kurikulum Merdeka untuk semua jenjang (SD, SMP, SMA, SMK).
 Tugas Anda: Menyusun instrumen asesmen, modul ajar, LKPD, dan administrasi guru yang baku, rapi, dan sesuai kaidah penulisan soal HOTS (Higher Order Thinking Skills).
@@ -17,13 +16,45 @@ const isPreview = window.location.hostname.includes('run.app') ||
                   window.location.hostname.includes('localhost') ||
                   window.location.hostname.includes('webcontainer.io');
 
-// Selalu gunakan PROXY agar API Key aman di sisi server (tidak bocor ke browser)
 const PROXY_URL = "/gemini_proxy.php";
 
 const handleError = (error: any) => {
   console.error("API Error:", error);
   const message = error?.message || "";
   return `Gagal generate konten: ${message || "Terjadi kesalahan sistem."}`;
+};
+
+// Fungsi pembantu untuk memanggil AI (Preview vs Hosting)
+const callAI = async (prompt: string, isJson: boolean = false) => {
+  try {
+    if (isPreview) {
+      // MODE PREVIEW: Gunakan SDK resmi dengan Key dari Environment (Otomatis & Aman)
+      const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const response = await genAI.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: prompt,
+        config: { 
+          systemInstruction: SYSTEM_INSTRUCTION,
+          responseMimeType: isJson ? "application/json" : "text/plain",
+          temperature: isJson ? 0.4 : 0.7 
+        }
+      });
+      return isJson ? JSON.parse(response.text || "{}") : (response.text || "");
+    } else {
+      // MODE HOSTING: Gunakan PHP Proxy
+      const response = await fetch(PROXY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || (isJson ? "{}" : "");
+      return isJson ? JSON.parse(text) : text;
+    }
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const generateModulAjar = async (params: {
@@ -48,19 +79,7 @@ II. KOMPONEN INTI
 III. LAMPIRAN`;
 
   try {
-    const response = await fetch(PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
-    const data = await response.json();
-    
-    if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
-    
-    // Handle format response dari Gemini API via Proxy
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error("Format balasan AI tidak sesuai.");
-    return text;
+    return await callAI(prompt);
   } catch (err) {
     throw new Error(handleError(err));
   }
@@ -81,17 +100,7 @@ Tingkat Kesulitan: ${params.difficulty} (Berbasis HOTS).
 WAJIB menghasilkan JSON dengan struktur: { kisiKisi: [], soal: [] }`;
 
   try {
-    const response = await fetch(PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
-    const data = await response.json();
-    
-    if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
-    
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-    return JSON.parse(text);
+    return await callAI(prompt, true);
   } catch (err) {
     throw new Error(handleError(err));
   }
@@ -106,18 +115,7 @@ export const generateLKPD = async (params: {
 }) => {
   const prompt = `Buatkan LKPD interaktif untuk ${params.subject}, topik: ${params.topic}.`;
   try {
-    const response = await fetch(PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
-    const data = await response.json();
-    
-    if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
-    
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error("Format balasan AI tidak sesuai.");
-    return text;
+    return await callAI(prompt);
   } catch (err) {
     throw new Error(handleError(err));
   }
@@ -132,18 +130,7 @@ export const generateAdminDocs = async (params: {
 }) => {
   const prompt = `Buatkan dokumen ${params.docType} untuk ${params.subject} Fase ${params.fase}.`;
   try {
-    const response = await fetch(PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
-    const data = await response.json();
-    
-    if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
-    
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error("Format balasan AI tidak sesuai.");
-    return text;
+    return await callAI(prompt);
   } catch (err) {
     throw new Error(handleError(err));
   }
