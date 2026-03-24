@@ -1,21 +1,19 @@
 <?php
-/**
- * api-proxy.php - Jembatan Aman ke Gemini AI
- */
-require_once 'config.php';
-protect_page(); // Hanya user login yang bisa panggil AI
-
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit;
+}
+
+$API_KEY = getenv('GEMINI_API_KEY') ?: 'YOUR_GEMINI_API_KEY_HERE';
 
 $input = json_decode(file_get_contents('php://input'), true);
 $prompt = $input['prompt'] ?? '';
 $instruction = $input['instruction'] ?? '';
 $isJson = $input['isJson'] ?? false;
-
-if (empty($prompt)) {
-    echo json_encode(['error' => 'Prompt kosong.']);
-    exit;
-}
 
 $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $API_KEY;
 
@@ -36,13 +34,5 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 $response = curl_exec($ch);
-$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-if (curl_errno($ch)) {
-    echo json_encode(['error' => 'Curl error: ' . curl_error($ch)]);
-} else {
-    http_response_code($httpCode);
-    echo $response;
-}
+echo $response;
 curl_close($ch);
-?>
