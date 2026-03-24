@@ -16,8 +16,9 @@ Ketentuan Penulisan:
 const isPreview = window.location.hostname.includes('run.app') || 
                   window.location.hostname.includes('localhost') ||
                   window.location.hostname.includes('webcontainer.io');
+
+// Selalu gunakan PROXY agar API Key aman di sisi server (tidak bocor ke browser)
 const PROXY_URL = "/gemini_proxy.php";
-const FALLBACK_KEY = "AIzaSyBUjtjmbbwIp0ZNzmYmwa4WSp3I0IRY1KQ";
 
 const handleError = (error: any) => {
   console.error("API Error:", error);
@@ -47,23 +48,19 @@ II. KOMPONEN INTI
 III. LAMPIRAN`;
 
   try {
-    if (isPreview) {
-      const ai = new GoogleGenAI({ apiKey: FALLBACK_KEY });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: prompt,
-        config: { systemInstruction: SYSTEM_INSTRUCTION, temperature: 0.7 }
-      });
-      return response.text || "";
-    } 
-
     const response = await fetch(PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
     const data = await response.json();
-    return data.candidates[0].content.parts[0].text;
+    
+    if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+    
+    // Handle format response dari Gemini API via Proxy
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error("Format balasan AI tidak sesuai.");
+    return text;
   } catch (err) {
     throw new Error(handleError(err));
   }
@@ -84,27 +81,16 @@ Tingkat Kesulitan: ${params.difficulty} (Berbasis HOTS).
 WAJIB menghasilkan JSON dengan struktur: { kisiKisi: [], soal: [] }`;
 
   try {
-    if (isPreview) {
-      const ai = new GoogleGenAI({ apiKey: FALLBACK_KEY });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: prompt,
-        config: {
-          systemInstruction: SYSTEM_INSTRUCTION,
-          responseMimeType: "application/json",
-          temperature: 0.4
-        }
-      });
-      return JSON.parse(response.text || "{}");
-    }
-
     const response = await fetch(PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
     const data = await response.json();
-    const text = data.candidates[0].content.parts[0].text || "{}";
+    
+    if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+    
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
     return JSON.parse(text);
   } catch (err) {
     throw new Error(handleError(err));
@@ -120,23 +106,18 @@ export const generateLKPD = async (params: {
 }) => {
   const prompt = `Buatkan LKPD interaktif untuk ${params.subject}, topik: ${params.topic}.`;
   try {
-    if (isPreview) {
-      const ai = new GoogleGenAI({ apiKey: FALLBACK_KEY });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: prompt,
-        config: { systemInstruction: SYSTEM_INSTRUCTION }
-      });
-      return response.text || "";
-    }
-
     const response = await fetch(PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
     const data = await response.json();
-    return data.candidates[0].content.parts[0].text;
+    
+    if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+    
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error("Format balasan AI tidak sesuai.");
+    return text;
   } catch (err) {
     throw new Error(handleError(err));
   }
@@ -151,23 +132,18 @@ export const generateAdminDocs = async (params: {
 }) => {
   const prompt = `Buatkan dokumen ${params.docType} untuk ${params.subject} Fase ${params.fase}.`;
   try {
-    if (isPreview) {
-      const ai = new GoogleGenAI({ apiKey: FALLBACK_KEY });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: prompt,
-        config: { systemInstruction: SYSTEM_INSTRUCTION }
-      });
-      return response.text || "";
-    }
-
     const response = await fetch(PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
     const data = await response.json();
-    return data.candidates[0].content.parts[0].text;
+    
+    if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+    
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error("Format balasan AI tidak sesuai.");
+    return text;
   } catch (err) {
     throw new Error(handleError(err));
   }
