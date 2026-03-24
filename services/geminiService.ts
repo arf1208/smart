@@ -14,7 +14,7 @@ Ketentuan Penulisan:
 
 // Mode Pintar: Deteksi apakah sedang di Preview atau di Hosting asli
 const isPreview = window.location.hostname.includes('run.app') || window.location.hostname.includes('localhost');
-const PROXY_URL = "/php-backend/gemini_proxy.php";
+const PROXY_URL = "/gemini_proxy.php";
 const FALLBACK_KEY = "AIzaSyBUjtjmbbwIp0ZNzmYmwa4WSp3I0IRY1KQ";
 
 const handleError = (error: any) => {
