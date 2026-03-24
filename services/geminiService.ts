@@ -17,46 +17,68 @@ const handleError = (error: any) => {
   return `Gagal generate konten: ${message || "Terjadi kesalahan sistem."}`;
 };
 
-// Mode Preview: Gunakan SDK resmi dengan Key dari Environment (Otomatis & Aman)
+// Deteksi apakah sedang di Preview (AI Studio/Local) atau Hosting (Rumahweb)
+const isPreview = window.location.hostname.includes('run.app') || 
+                  window.location.hostname.includes('localhost') ||
+                  window.location.hostname.includes('webcontainer.io');
+
 const callAI = async (prompt: string, isJson: boolean = false) => {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    
-    if (!apiKey || apiKey === "undefined") {
-      return "Gagal: Gemini API Key tidak ditemukan di environment. Pastikan Anda sudah menyetelnya di pengaturan.";
-    }
-
-    const genAI = new GoogleGenAI({ apiKey });
-    const result = await genAI.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-      config: { 
-        systemInstruction: SYSTEM_INSTRUCTION,
-        responseMimeType: isJson ? "application/json" : "text/plain",
-        temperature: isJson ? 0.4 : 0.7 
+    // --- MODE PREVIEW (AI STUDIO / LOCAL) ---
+    if (isPreview) {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey || apiKey === "undefined") {
+        throw new Error("Gemini API Key tidak ditemukan. Silakan tambahkan GEMINI_API_KEY di menu Settings.");
       }
-    });
 
-    const text = result.text;
-    console.log("AI Raw Response:", text);
+      const genAI = new GoogleGenAI({ apiKey });
+      const result = await genAI.models.generateContent({
+        model: 'gemini-1.5-flash', // Gunakan model stabil untuk hosting
+        contents: prompt,
+        config: { 
+          systemInstruction: SYSTEM_INSTRUCTION,
+          responseMimeType: isJson ? "application/json" : "text/plain",
+          temperature: isJson ? 0.4 : 0.7 
+        }
+      });
 
-    if (!text) {
-      throw new Error("AI tidak memberikan respon (mungkin terblokir filter keamanan).");
-    }
-
-    if (isJson) {
-      try {
-        // Bersihkan jika AI memberikan markdown code blocks
+      const text = result.text;
+      if (!text) throw new Error("AI tidak memberikan respon.");
+      
+      if (isJson) {
         const cleanJson = text.replace(/```json\n?|```/g, "").trim();
         return JSON.parse(cleanJson);
-      } catch (e) {
-        console.error("JSON Parse Error:", e, "Raw text:", text);
-        throw new Error("Format data dari AI tidak valid. Silakan coba lagi.");
       }
-    }
+      return text;
+    } 
     
-    return text;
-  } catch (err) {
+    // --- MODE HOSTING (RUMAHWEB / PHP PROXY) ---
+    else {
+      const response = await fetch('/api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, systemInstruction: SYSTEM_INSTRUCTION, isJson })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      // Format respon dari API Google langsung (via PHP)
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (!text) throw new Error("Respon AI kosong dari server.");
+
+      if (isJson) {
+        const cleanJson = text.replace(/```json\n?|```/g, "").trim();
+        return JSON.parse(cleanJson);
+      }
+      return text;
+    }
+  } catch (err: any) {
+    console.error("CallAI Error:", err);
     throw err;
   }
 };
@@ -84,7 +106,7 @@ III. LAMPIRAN`;
 
   try {
     return await callAI(prompt);
-  } catch (err) {
+  } catch (err: any) {
     throw new Error(handleError(err));
   }
 };
@@ -111,16 +133,18 @@ WAJIB menghasilkan JSON dengan struktur berikut dan JANGAN biarkan array 'soal' 
     {
       "nomor": 1,
       "pertanyaan": "...",
-      "pilihan": { "A": "...", "B": "...", "C": "...", "D": "...", "E": "..." },
+      "opsi": ["Pilihan A", "Pilihan B", "Pilihan C", "Pilihan D", "Pilihan E"],
       "jawabanBenar": "A",
       "penjelasan": "..."
     }
   ]
-}`;
+}
+
+Catatan: Untuk 'opsi', berikan array string berisi 5 pilihan jawaban.`;
 
   try {
     return await callAI(prompt, true);
-  } catch (err) {
+  } catch (err: any) {
     throw new Error(handleError(err));
   }
 };
@@ -135,7 +159,7 @@ export const generateLKPD = async (params: {
   const prompt = `Buatkan LKPD interaktif untuk ${params.subject}, topik: ${params.topic}.`;
   try {
     return await callAI(prompt);
-  } catch (err) {
+  } catch (err: any) {
     throw new Error(handleError(err));
   }
 };
@@ -150,7 +174,7 @@ export const generateAdminDocs = async (params: {
   const prompt = `Buatkan dokumen ${params.docType} untuk ${params.subject} Fase ${params.fase}.`;
   try {
     return await callAI(prompt);
-  } catch (err) {
+  } catch (err: any) {
     throw new Error(handleError(err));
   }
 };

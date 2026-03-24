@@ -22,26 +22,45 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     }
     setLoading(true);
     
+    // Deteksi apakah sedang di Preview atau Hosting
+    const isPreview = window.location.hostname.includes('run.app') || 
+                      window.location.hostname.includes('localhost') ||
+                      window.location.hostname.includes('webcontainer.io');
+
     try {
       let data;
-      console.log(`Login attempt: Fetching from users.json`);
+      console.log(`Login attempt in ${isPreview ? 'PREVIEW' : 'HOSTING'} mode`);
       
-      // Membaca langsung dari users.json (karena file PHP sudah dihapus)
-      const response = await fetch('/users.json');
-      if (!response.ok) {
-        throw new Error(`Gagal memuat users.json (Status: ${response.status})`);
-      }
-      const users = await response.json();
-      console.log('Available users:', users);
-      
-      const user = users.find((u: any) => 
-        (u.email === email || u.username === email) && u.password === password
-      );
-      
-      if (user) {
-        data = { success: true, user: { name: user.name, email: user.email } };
+      if (isPreview) {
+        // MODE PREVIEW: Baca langsung dari users.json (karena server dev tidak bisa jalankan PHP)
+        const response = await fetch('/users.json');
+        if (!response.ok) {
+          throw new Error(`Gagal memuat users.json (Status: ${response.status})`);
+        }
+        const users = await response.json();
+        console.log('Available users in preview:', users);
+        
+        const user = users.find((u: any) => 
+          (u.email === email || u.username === email) && u.password === password
+        );
+        
+        if (user) {
+          data = { success: true, user: { name: user.name, email: user.email } };
+        } else {
+          data = { success: false, message: 'Email atau Password salah.' };
+        }
       } else {
-        data = { success: false, message: 'Email atau Password salah.' };
+        // MODE HOSTING: Gunakan login.php (Aman & Server-side)
+        const response = await fetch('/login.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        data = await response.json();
       }
 
       if (data.success && data.user) {
