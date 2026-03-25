@@ -6,3 +6,5 @@ export const FASE_OPTIONS = [
   { value: 'E', label: 'Fase E (Kelas 10)' },
   { value: 'F', label: 'Fase F (Kelas 11-12)' },
 ];
+
+export const APP_LOGO_URL = "https://picsum.photos/seed/smartschool/200/200";

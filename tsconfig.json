@@ -20,5 +20,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "index.tsx", "App.tsx", "pages", "services", "components", "context", "types.ts", "constants.tsx"]
+  "include": ["src"]
 }

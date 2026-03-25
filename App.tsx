@@ -14,7 +14,6 @@ import { APP_LOGO_URL } from './constants';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isApiKeySelected, setIsApiKeySelected] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
@@ -33,23 +32,6 @@ const App: React.FC = () => {
     }, 30);
     return () => clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    const checkApiKey = async () => {
-      if (window.aistudio) {
-        const hasKey = await window.aistudio.hasSelectedApiKey();
-        setIsApiKeySelected(hasKey);
-      }
-    };
-    checkApiKey();
-  }, []);
-
-  const handleSelectKey = async () => {
-    if (window.aistudio) {
-      await window.aistudio.openSelectKey();
-      setIsApiKeySelected(true);
-    }
-  };
 
   const renderContent = () => {
     // Shared back button component for sub-pages
@@ -226,41 +208,6 @@ const App: React.FC = () => {
         >
           {!isLoggedIn ? (
             <LoginPage onLogin={() => setIsLoggedIn(true)} />
-          ) : !isApiKeySelected ? (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="max-w-md w-full bg-white rounded-[32px] p-10 shadow-xl border border-slate-100 text-center space-y-8"
-              >
-                <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto">
-                  <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                  </svg>
-                </div>
-                <div className="space-y-3">
-                  <h2 className="text-2xl font-black text-slate-800">Aktivasi Fitur AI</h2>
-                  <p className="text-slate-500 font-medium leading-relaxed">
-                    Untuk menggunakan model <strong>Gemini 3 Flash</strong>, Anda perlu mengaktifkan API Key Anda sendiri. 
-                    Silakan pilih API Key dari project Google Cloud Anda.
-                  </p>
-                  <a 
-                    href="https://ai.google.dev/gemini-api/docs/billing" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-block text-xs font-bold text-blue-600 hover:underline"
-                  >
-                    Pelajari tentang Billing & API Key →
-                  </a>
-                </div>
-                <button
-                  onClick={handleSelectKey}
-                  className="w-full py-4 bg-blue-600 text-white font-black rounded-2xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  PILIH API KEY SEKARANG
-                </button>
-              </motion.div>
-            </div>
           ) : (
             <Layout 
               activeTab={activeTab} 
