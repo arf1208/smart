@@ -1,7 +1,11 @@
 
 import React from 'react';
 
-const Tutorial: React.FC = () => {
+interface TutorialProps {
+  onBack?: () => void;
+}
+
+const Tutorial: React.FC<TutorialProps> = ({ onBack }) => {
   const steps = [
     {
       title: 'Generate Modul Ajar',
@@ -28,6 +32,12 @@ const Tutorial: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#fcfdfe] pb-24 font-['Inter']">
       <div className="max-w-4xl mx-auto px-6 pt-12">
+        {onBack && (
+          <button onClick={onBack} className="mb-6 flex items-center gap-2 text-slate-400 font-black hover:text-blue-600 transition-colors uppercase tracking-widest text-[10px] no-print">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+            Kembali ke Dashboard
+          </button>
+        )}
         <div className="mb-12 text-center relative">
           <div className="absolute right-0 top-0 no-print">
             <button 

@@ -5,7 +5,11 @@ import { EducationLevel, Fase } from '../types';
 import { SUBJECTS } from '../constants';
 import { useToast } from '../context/ToastContext';
 
-const QuestionGenerator: React.FC = () => {
+interface QuestionGeneratorProps {
+  onBack?: () => void;
+}
+
+const QuestionGenerator: React.FC<QuestionGeneratorProps> = ({ onBack }) => {
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState('');
@@ -111,6 +115,12 @@ const QuestionGenerator: React.FC = () => {
     <div className="min-h-screen bg-[#f8fafc] pb-24 font-['Inter']">
       <div className="max-w-6xl mx-auto px-6 pt-12">
         <div className="mb-10 text-center md:text-left no-print">
+          {onBack && (
+            <button onClick={onBack} className="mb-6 flex items-center gap-2 text-slate-400 font-black hover:text-indigo-600 transition-colors uppercase tracking-widest text-[10px]">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              Kembali ke Dashboard
+            </button>
+          )}
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest mb-3">SISTEM ASESMEN TERPADU</div>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Generator <span className="text-indigo-600">Bank Soal</span></h1>
           <p className="text-slate-500 font-medium mt-1">Hasilkan soal ujian resmi dengan struktur yang sangat rapi.</p>
@@ -136,7 +146,11 @@ const QuestionGenerator: React.FC = () => {
                   value={formData.subject} 
                   onChange={e => setFormData({...formData, subject: e.target.value})} 
                   required 
+                  list="subjects-list"
                 />
+                <datalist id="subjects-list">
+                  {SUBJECTS.map(s => <option key={s} value={s} />)}
+                </datalist>
               </div>
               <div className="space-y-2">
                 <label className="input-label">Kelas / Rombel</label>

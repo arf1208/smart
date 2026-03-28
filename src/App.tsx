@@ -14,6 +14,7 @@ import { APP_LOGO_URL } from './constants';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
@@ -54,21 +55,21 @@ const App: React.FC = () => {
 
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard setActiveTab={setActiveTab} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />;
+        return <Dashboard user={user} onNavigate={setActiveTab} onLogout={() => setIsLoggedIn(false)} />;
       case 'modul':
-        return <><BackButton /><ModulAjarGenerator /></>;
+        return <><BackButton /><ModulAjarGenerator onBack={() => setActiveTab('dashboard')} /></>;
       case 'soal':
-        return <><BackButton /><QuestionGenerator /></>;
+        return <><BackButton /><QuestionGenerator onBack={() => setActiveTab('dashboard')} /></>;
       case 'lkpd':
-        return <><BackButton /><LKPDGenerator /></>;
+        return <><BackButton /><LKPDGenerator onBack={() => setActiveTab('dashboard')} /></>;
       case 'admin-docs':
-        return <><BackButton /><AdminDocsGenerator /></>;
+        return <><BackButton /><AdminDocsGenerator onBack={() => setActiveTab('dashboard')} /></>;
       case 'library':
         return <><BackButton /><Library searchTerm={searchTerm} setSearchTerm={setSearchTerm} /></>;
       case 'tutorial':
-        return <><BackButton /><Tutorial /></>;
+        return <><BackButton /><Tutorial onBack={() => setActiveTab('dashboard')} /></>;
       default:
-        return <Dashboard setActiveTab={setActiveTab} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />;
+        return <Dashboard user={user} onNavigate={setActiveTab} onLogout={() => setIsLoggedIn(false)} />;
     }
   };
 
@@ -207,7 +208,10 @@ const App: React.FC = () => {
           className="min-h-screen"
         >
           {!isLoggedIn ? (
-            <LoginPage onLogin={() => setIsLoggedIn(true)} />
+            <LoginPage onLogin={(userData) => {
+              setUser(userData);
+              setIsLoggedIn(true);
+            }} />
           ) : (
             <Layout 
               activeTab={activeTab} 

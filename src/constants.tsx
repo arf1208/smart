@@ -8,3 +8,21 @@ export const FASE_OPTIONS = [
 ];
 
 export const APP_LOGO_URL = "https://picsum.photos/seed/smartschool/200/200";
+
+export const SUBJECTS = [
+  'Matematika',
+  'Bahasa Indonesia',
+  'Bahasa Inggris',
+  'Fisika',
+  'Kimia',
+  'Biologi',
+  'Ekonomi',
+  'Geografi',
+  'Sosiologi',
+  'Sejarah',
+  'PPKn',
+  'Informatika',
+  'Seni Budaya',
+  'PJOK',
+  'PAI',
+];
