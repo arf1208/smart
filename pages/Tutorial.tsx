@@ -1,11 +1,7 @@
 
 import React from 'react';
 
-interface TutorialProps {
-  onBack?: () => void;
-}
-
-const Tutorial: React.FC<TutorialProps> = ({ onBack }) => {
+const Tutorial: React.FC = () => {
   const steps = [
     {
       title: 'Generate Modul Ajar',
@@ -32,22 +28,7 @@ const Tutorial: React.FC<TutorialProps> = ({ onBack }) => {
   return (
     <div className="min-h-screen bg-[#fcfdfe] pb-24 font-['Inter']">
       <div className="max-w-4xl mx-auto px-6 pt-12">
-        {onBack && (
-          <button onClick={onBack} className="mb-6 flex items-center gap-2 text-slate-400 font-black hover:text-blue-600 transition-colors uppercase tracking-widest text-[10px] no-print">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-            Kembali ke Dashboard
-          </button>
-        )}
-        <div className="mb-12 text-center relative">
-          <div className="absolute right-0 top-0 no-print">
-            <button 
-              onClick={() => window.print()}
-              className="p-3 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-blue-600 transition-all shadow-sm flex items-center gap-2 font-bold text-xs uppercase tracking-widest"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-              Cetak Panduan
-            </button>
-          </div>
+        <div className="mb-12 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest mb-3">PANDUAN PENGGUNA</div>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Pusat <span className="text-blue-600">Edukasi Smart School</span></h1>
           <p className="text-slate-500 font-medium mt-2">Pelajari cara memaksimalkan fitur asisten digital untuk produktivitas mengajar Anda.</p>

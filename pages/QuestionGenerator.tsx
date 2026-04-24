@@ -5,11 +5,7 @@ import { EducationLevel, Fase } from '../types';
 import { SUBJECTS } from '../constants';
 import { useToast } from '../context/ToastContext';
 
-interface QuestionGeneratorProps {
-  onBack?: () => void;
-}
-
-const QuestionGenerator: React.FC<QuestionGeneratorProps> = ({ onBack }) => {
+const QuestionGenerator: React.FC = () => {
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState('');
@@ -88,17 +84,9 @@ const QuestionGenerator: React.FC<QuestionGeneratorProps> = ({ onBack }) => {
 
   const exportToExcel = () => {
     if (!result) return;
-    let csv = "Nomor,Pertanyaan,A,B,C,D,E,Kunci,Penjelasan\n";
+    let csv = "Nomor,Pertanyaan,Kunci,Penjelasan\n";
     result.soal?.forEach((s: any) => {
-      let options: string[] = [];
-      if (Array.isArray(s.opsi)) {
-        options = s.opsi;
-      } else if (s.pilihan && typeof s.pilihan === 'object') {
-        options = [s.pilihan.A, s.pilihan.B, s.pilihan.C, s.pilihan.D, s.pilihan.E].filter(v => v !== undefined);
-      }
-      
-      const finalOptions = [...options, '', '', '', '', ''].slice(0, 5);
-      csv += `"${s.nomor}","${(s.pertanyaan || '').replace(/"/g, '""')}","${(finalOptions[0] || '').replace(/"/g, '""')}","${(finalOptions[1] || '').replace(/"/g, '""')}","${(finalOptions[2] || '').replace(/"/g, '""')}","${(finalOptions[3] || '').replace(/"/g, '""')}","${(finalOptions[4] || '').replace(/"/g, '""')}","${s.jawabanBenar}","${(s.penjelasan || '').replace(/"/g, '""')}"\n`;
+      csv += `"${s.nomor}","${(s.pertanyaan || '').replace(/"/g, '""')}","${s.jawabanBenar}","${(s.penjelasan || '').replace(/"/g, '""')}"\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -115,12 +103,6 @@ const QuestionGenerator: React.FC<QuestionGeneratorProps> = ({ onBack }) => {
     <div className="min-h-screen bg-[#f8fafc] pb-24 font-['Inter']">
       <div className="max-w-6xl mx-auto px-6 pt-12">
         <div className="mb-10 text-center md:text-left no-print">
-          {onBack && (
-            <button onClick={onBack} className="mb-6 flex items-center gap-2 text-slate-400 font-black hover:text-indigo-600 transition-colors uppercase tracking-widest text-[10px]">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-              Kembali ke Dashboard
-            </button>
-          )}
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest mb-3">SISTEM ASESMEN TERPADU</div>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Generator <span className="text-indigo-600">Bank Soal</span></h1>
           <p className="text-slate-500 font-medium mt-1">Hasilkan soal ujian resmi dengan struktur yang sangat rapi.</p>
@@ -146,11 +128,7 @@ const QuestionGenerator: React.FC<QuestionGeneratorProps> = ({ onBack }) => {
                   value={formData.subject} 
                   onChange={e => setFormData({...formData, subject: e.target.value})} 
                   required 
-                  list="subjects-list"
                 />
-                <datalist id="subjects-list">
-                  {SUBJECTS.map(s => <option key={s} value={s} />)}
-                </datalist>
               </div>
               <div className="space-y-2">
                 <label className="input-label">Kelas / Rombel</label>
@@ -285,29 +263,16 @@ const QuestionGenerator: React.FC<QuestionGeneratorProps> = ({ onBack }) => {
                           </div>
                         )}
                         <p className="text-lg font-bold text-slate-900 leading-snug">{s.pertanyaan}</p>
-                        {/* Render Options for Multiple Choice */}
-                        {(() => {
-                          let options: string[] = [];
-                          if (Array.isArray(s.opsi)) {
-                            options = s.opsi;
-                          } else if (s.pilihan && typeof s.pilihan === 'object') {
-                            options = [s.pilihan.A, s.pilihan.B, s.pilihan.C, s.pilihan.D, s.pilihan.E].filter(v => v !== undefined);
-                          }
-
-                          if (options.length > 0) {
-                            return (
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3 mt-4">
-                                {options.map((o: string, i: number) => (
-                                  <div key={i} className="flex gap-3 text-base">
-                                    <span className="font-bold">{String.fromCharCode(65+i)}.</span>
-                                    <span>{o}</span>
-                                  </div>
-                                ))}
+                        {s.opsi && s.opsi.length > 0 && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3 mt-4">
+                            {s.opsi.map((o: string, i: number) => (
+                              <div key={i} className="flex gap-3 text-base">
+                                <span className="font-bold">{String.fromCharCode(65+i)}.</span>
+                                <span>{o}</span>
                               </div>
-                            );
-                          }
-                          return null;
-                        })()}
+                            ))}
+                          </div>
+                        )}
                         {formData.type === 'Essay' && <div className="h-32 border-b-2 border-dashed border-slate-200 mt-4"></div>}
                       </div>
                     </div>

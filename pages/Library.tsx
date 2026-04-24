@@ -333,14 +333,7 @@ const Library: React.FC<LibraryProps> = ({ searchTerm, setSearchTerm }) => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             Kembali ke Detail Buku
           </button>
-          <div className="flex items-center gap-4 no-print">
-            <button 
-              onClick={() => window.print()}
-              className="p-3 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-blue-600 transition-all shadow-sm"
-              title="Cetak Bab Ini"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-            </button>
+          <div className="flex items-center gap-4">
             <button className="p-3 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-blue-600 transition-all shadow-sm">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
             </button>
@@ -350,7 +343,7 @@ const Library: React.FC<LibraryProps> = ({ searchTerm, setSearchTerm }) => {
           </div>
         </div>
 
-        <div id="printable-area" className={`rounded-[48px] shadow-2xl border transition-all duration-500 p-12 md:p-20 print:shadow-none print:border-none print:p-0 ${
+        <div className={`rounded-[48px] shadow-2xl border transition-all duration-500 p-12 md:p-20 ${
           readerTheme === 'light' ? 'bg-white border-slate-100' : 
           readerTheme === 'sepia' ? 'bg-[#f4ecd8] border-[#e6d5b8]' : 
           'bg-slate-900 border-slate-800'
@@ -374,7 +367,7 @@ const Library: React.FC<LibraryProps> = ({ searchTerm, setSearchTerm }) => {
               <div dangerouslySetInnerHTML={{ __html: content }} />
             </div>
 
-            <div className={`mt-20 pt-10 border-t flex items-center justify-between no-print ${
+            <div className={`mt-20 pt-10 border-t flex items-center justify-between ${
               readerTheme === 'dark' ? 'border-slate-800' : 'border-slate-100'
             }`}>
               <button className="flex items-center gap-3 text-slate-400 font-bold hover:text-blue-500 transition-colors">
@@ -419,11 +412,11 @@ const Library: React.FC<LibraryProps> = ({ searchTerm, setSearchTerm }) => {
           Kembali ke Perpustakaan
         </button>
 
-        <div id="printable-area" className="bg-white rounded-[40px] shadow-2xl border border-slate-100 overflow-hidden print:shadow-none print:border-none print:p-0">
+        <div className="bg-white rounded-[40px] shadow-2xl border border-slate-100 overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-12">
             {/* Sidebar / Cover Area */}
-            <div className="lg:col-span-4 bg-slate-50 p-12 flex flex-col items-center border-r border-slate-100 print:bg-white print:border-none">
-              <div className="w-full aspect-[2/3] rounded-[32px] overflow-hidden shadow-2xl mb-8 relative group/cover print:shadow-none">
+            <div className="lg:col-span-4 bg-slate-50 p-12 flex flex-col items-center border-r border-slate-100">
+              <div className="w-full aspect-[2/3] rounded-[32px] overflow-hidden shadow-2xl mb-8 relative group/cover">
                 <img src={selectedBook.cover} referrerPolicy="no-referrer" className="w-full h-full object-cover" alt={selectedBook.title} />
                 <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover/cover:opacity-100 transition-opacity"></div>
               </div>
@@ -440,29 +433,20 @@ const Library: React.FC<LibraryProps> = ({ searchTerm, setSearchTerm }) => {
                   </div>
                 </div>
                 
-                <div className="flex gap-3 no-print">
-                  <button 
-                    className="flex-1 py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-100 flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
-                      link.download = `${selectedBook.title}.pdf`;
-                      link.target = '_blank';
-                      link.click();
-                      showToast('Mengunduh buku: ' + selectedBook.title, 'success');
-                    }}
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                    Unduh PDF
-                  </button>
-                  <button 
-                    onClick={() => window.print()}
-                    className="px-6 py-5 bg-white border-2 border-slate-200 text-slate-400 hover:text-blue-600 hover:border-blue-600 rounded-2xl transition-all shadow-sm"
-                    title="Cetak Detail Buku"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                  </button>
-                </div>
+                <button 
+                  className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-100 flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
+                    link.download = `${selectedBook.title}.pdf`;
+                    link.target = '_blank';
+                    link.click();
+                    showToast('Mengunduh buku: ' + selectedBook.title, 'success');
+                  }}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                  Unduh Buku (PDF)
+                </button>
                 <p className="text-[10px] text-center text-slate-400 font-bold uppercase tracking-widest">Tersedia untuk dibaca offline</p>
               </div>
             </div>

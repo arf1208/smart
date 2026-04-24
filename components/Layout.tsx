@@ -14,7 +14,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, onLogout, searchTerm, setSearchTerm }) => {
   return (
-    <div className="flex flex-col h-screen bg-slate-50 overflow-hidden font-['Inter'] print:h-auto print:overflow-visible">
+    <div className="flex flex-col h-screen bg-slate-50 overflow-hidden font-['Inter']">
       <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 md:px-12 z-20 no-print shrink-0">
         <div 
           className="flex items-center gap-3 cursor-pointer group"
@@ -83,9 +83,9 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, onLo
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col overflow-hidden relative print:overflow-visible print:h-auto">
-        <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#fcfdfe] print:overflow-visible print:h-auto">
-          <div className="max-w-7xl mx-auto w-full print:max-w-none">
+      <main className="flex-1 flex flex-col overflow-hidden relative">
+        <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#fcfdfe]">
+          <div className="max-w-7xl mx-auto w-full">
             {children}
           </div>
         </div>

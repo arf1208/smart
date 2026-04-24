@@ -41,12 +41,3 @@ export interface GeneratedContent {
   content: string;
   timestamp: number;
 }
-
-declare global {
-  interface Window {
-    aistudio: {
-      hasSelectedApiKey: () => Promise<boolean>;
-      openSelectKey: () => Promise<void>;
-    };
-  }
-}
