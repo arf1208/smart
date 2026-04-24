@@ -1,4 +1,3 @@
-import { GoogleGenAI } from "@google/genai";
 
 const SYSTEM_INSTRUCTION = `Anda adalah AI Pakar Evaluasi Pendidikan Indonesia dengan spesialisasi Kurikulum Merdeka untuk semua jenjang (SD, SMP, SMA, SMK).
 Tugas Anda: Menyusun instrumen asesmen, modul ajar, LKPD, dan administrasi guru yang baku, rapi, dan sesuai kaidah penulisan soal HOTS (Higher Order Thinking Skills).
@@ -17,46 +16,26 @@ const handleError = (error: any) => {
   return `Gagal generate konten: ${message || "Terjadi kesalahan sistem."}`;
 };
 
-// Mode Preview: Gunakan SDK resmi dengan Key dari Environment (Otomatis & Aman)
+// Mode Preview: Gunakan Proxy Server untuk keamanan API Key
 const callAI = async (prompt: string, isJson: boolean = false) => {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    
-    if (!apiKey || apiKey === "undefined") {
-      return "Gagal: Gemini API Key tidak ditemukan di environment. Pastikan Anda sudah menyetelnya di pengaturan.";
-    }
-
-    const genAI = new GoogleGenAI({ apiKey });
-    const result = await genAI.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-      config: { 
-        systemInstruction: SYSTEM_INSTRUCTION,
-        responseMimeType: isJson ? "application/json" : "text/plain",
-        temperature: isJson ? 0.4 : 0.7 
-      }
+    const response = await fetch("/api/ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt, isJson }),
     });
 
-    const text = result.text;
-    console.log("AI Raw Response:", text);
+    const data = await response.json();
 
-    if (!text) {
-      throw new Error("AI tidak memberikan respon (mungkin terblokir filter keamanan).");
+    if (!response.ok) {
+      throw new Error(data.error || "Gagal menghubungi AI Service");
     }
 
-    if (isJson) {
-      try {
-        // Bersihkan jika AI memberikan markdown code blocks
-        const cleanJson = text.replace(/```json\n?|```/g, "").trim();
-        return JSON.parse(cleanJson);
-      } catch (e) {
-        console.error("JSON Parse Error:", e, "Raw text:", text);
-        throw new Error("Format data dari AI tidak valid. Silakan coba lagi.");
-      }
-    }
-    
-    return text;
-  } catch (err) {
+    return isJson ? data : data.text;
+  } catch (err: any) {
+    console.error("AI Client Error:", err);
     throw err;
   }
 };
