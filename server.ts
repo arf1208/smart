@@ -31,9 +31,27 @@ async function startServer() {
     const { prompt, isJson } = req.body;
     
     try {
-      const rawApiKey = process.env.MY_API_KEY || process.env.GEMINI_API_KEY;
+      let rawApiKey = process.env.MY_API_KEY || process.env.GEMINI_API_KEY;
+      
+      // Keamanan Tambahan: Membaca API Key dari file eksternal (seperti PHP) dengan cara yang lebih aman
+      const configPath = path.join(process.cwd(), "config.php");
+      if ((!rawApiKey || rawApiKey.includes("undefined")) && fs.existsSync(configPath)) {
+        try {
+          const content = fs.readFileSync(configPath, "utf-8");
+          // Gunakan regex yang lebih fleksibel untuk mendukung berbagai gaya penulisan PHP
+          const match = content.match(/\$MY_API_KEY\s*=\s*(['"])(.*?)\1\s*;/);
+          if (match && match[2]) {
+            rawApiKey = match[2];
+          }
+        } catch (err) {
+          console.error("Gagal membaca file konfigurasi:", err);
+        }
+      }
+
       if (!rawApiKey) {
-        return res.status(500).json({ error: "API Key tidak ditemukan. Silakan tambahkan MY_API_KEY di menu Settings > Secrets." });
+        return res.status(500).json({ 
+          error: "API Key tidak ditemukan. Silakan isi API Key di file 'config.php' atau di menu 'Settings > Secrets'." 
+        });
       }
 
       const apiKey = rawApiKey.trim();
